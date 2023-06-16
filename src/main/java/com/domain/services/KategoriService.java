@@ -2,6 +2,8 @@ package com.domain.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
@@ -15,30 +17,41 @@ import com.domain.models.repos.KategoriRepo;
 @Transactional
 public class KategoriService {
 
-    @Autowired
-    private KategoriRepo kategoriRepo;
+    private final KategoriRepo kategoriRepo;
 
-    public Kategori save(Kategori kategori){
+    @Autowired
+    public KategoriService(KategoriRepo kategoriRepo) {
+        this.kategoriRepo = kategoriRepo;
+    }
+
+    public Kategori save(Kategori kategori) {
         return kategoriRepo.save(kategori);
     }
 
-    public Kategori findID(Long id){
-        Optional<Kategori> kategori = kategoriRepo.findById(id);
-        if(!kategori.isPresent()){
+    public Optional<Kategori> findID(Long id) {
+        return Optional.ofNullable(kategoriRepo.findById(id));
+    }
+
+    public List<Kategori> findAll() {
+        Iterable<Kategori> kategoriList = kategoriRepo.findAll();
+        return StreamSupport.stream(kategoriList.spliterator(), false)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteById(Long id) {
+        kategoriRepo.delete(id);
+    }
+
+    public List<Kategori> findByName(String name) {
+        return kategoriRepo.findByNameContains(name);
+    }
+
+    public Kategori update(Kategori kategori) {
+        int rowsAffected = kategoriRepo.update(kategori);
+        if (rowsAffected > 0) {
+            return kategori;
+        } else {
             return null;
         }
-        return kategori.get();
-    }
-
-    public Iterable<Kategori> findAll(){
-        return kategoriRepo.findAll();
-    }
-
-    public void removeID(Long id){
-        kategoriRepo.deleteById(id);
-    }
-
-    public List<Kategori> findByName(String name){
-        return kategoriRepo.findByNameContains(name);
     }
 }

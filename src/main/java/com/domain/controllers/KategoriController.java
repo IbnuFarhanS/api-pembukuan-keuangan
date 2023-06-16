@@ -1,6 +1,10 @@
 package com.domain.controllers;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,31 +21,44 @@ import com.domain.services.KategoriService;
 @RequestMapping("/api/kategori")
 public class KategoriController {
 
+    private final KategoriService kategoriService;
+
     @Autowired
-    private KategoriService kategoriService;
+    public KategoriController(KategoriService kategoriService) {
+        this.kategoriService = kategoriService;
+    }
 
     @PostMapping
-    public Kategori create(@RequestBody Kategori kategori){
+    public Kategori create(@RequestBody Kategori kategori) {
         return kategoriService.save(kategori);
     }
 
     @GetMapping
-    public Iterable<Kategori> findAll(){
+    public List<Kategori> findAll() {
         return kategoriService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Kategori findID(@PathVariable("id") Long id){
-        return kategoriService.findID(id);
+    public ResponseEntity<Kategori> findID(@PathVariable("id") Long id) {
+        Optional<Kategori> kategori = kategoriService.findID(id);
+        return kategori.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping
-    public Kategori update(@RequestBody Kategori kategori){
-        return kategoriService.save(kategori);
+    @PutMapping("/{id}")
+    public Kategori update(@PathVariable("id") Long id, @RequestBody Kategori kategori) {
+        Kategori existingKategori = kategoriService.findID(id).orElse(null);
+        if (existingKategori != null) {
+            existingKategori.setName(kategori.getName());
+            return kategoriService.update(existingKategori);
+        } else {
+            return null;
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void removeID(@PathVariable("id") Long id){
-        kategoriService.removeID(id);
+    public ResponseEntity<String> deleteById(@PathVariable("id") Long id) {
+        kategoriService.deleteById(id);
+        return ResponseEntity.ok("Data dengan ID " + id + " berhasil dihapus.");
     }
 }
