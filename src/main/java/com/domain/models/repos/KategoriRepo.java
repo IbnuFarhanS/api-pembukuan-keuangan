@@ -2,6 +2,7 @@ package com.domain.models.repos;
 
 import com.domain.models.entities.Kategori;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class KategoriRepo {
@@ -53,25 +55,29 @@ public class KategoriRepo {
 
 
     // KategoriRepo.java
-public void delete(Long id) {
-    if (existsById(id)) {
-        String sql = "DELETE FROM tbl_kategori WHERE id = :id";
-        MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
-        jdbcTemplate.update(sql, params);
+    public void delete(Long id) {
+        if (existsById(id)) {
+            String sql = "DELETE FROM tbl_kategori WHERE id = :id";
+            MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
+            jdbcTemplate.update(sql, params);
+        }
     }
-}
-
 
     public List<Kategori> findAll() {
         String sql = "SELECT * FROM tbl_kategori";
         return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Kategori.class));
     }
 
-    public Kategori findById(Long id) {
+    public Optional<Kategori> findById(Long id) {
         String sql = "SELECT * FROM tbl_kategori WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id);
-        return jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Kategori.class));
+        try {
+            Kategori kategori = jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Kategori.class));
+            return Optional.ofNullable(kategori);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public int update(Kategori kategori) {

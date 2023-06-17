@@ -28,8 +28,8 @@ public class KategoriService {
         return kategoriRepo.save(kategori);
     }
 
-    public Optional<Kategori> findID(Long id) {
-        return Optional.ofNullable(kategoriRepo.findById(id));
+    public Optional<Kategori> findById(Long id) {
+        return kategoriRepo.findById(id);
     }
 
     public List<Kategori> findAll() {

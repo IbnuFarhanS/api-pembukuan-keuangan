@@ -19,6 +19,10 @@ public class Kategori {
         this.name = name;
     }
 
+    public Kategori(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
@@ -33,9 +37,5 @@ public class Kategori {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Kategori orElse(Object object) {
-        return null;
     }
 }

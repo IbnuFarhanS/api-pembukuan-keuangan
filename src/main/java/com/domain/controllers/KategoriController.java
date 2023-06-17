@@ -40,14 +40,14 @@ public class KategoriController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Kategori> findID(@PathVariable("id") Long id) {
-        Optional<Kategori> kategori = kategoriService.findID(id);
+        Optional<Kategori> kategori = kategoriService.findById(id);
         return kategori.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public Kategori update(@PathVariable("id") Long id, @RequestBody Kategori kategori) {
-        Kategori existingKategori = kategoriService.findID(id).orElse(null);
+        Kategori existingKategori = kategoriService.findById(id).orElse(null);
         if (existingKategori != null) {
             existingKategori.setName(kategori.getName());
             return kategoriService.update(existingKategori);
