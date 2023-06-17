@@ -48,12 +48,15 @@ public class DaftarKeuanganService {
     }
 
     public DaftarKeuangan update(DaftarKeuangan daftarKeuangan) {
-        int rowsAffected = daftarKeuanganRepo.update(daftarKeuangan);
-        if (rowsAffected > 0) {
-            return daftarKeuangan;
-        } else {
-            return null;
+        Kategori kategori = kategoriService.findById(daftarKeuangan.getKategori().getId()).orElse(null);
+        if (kategori != null) {
+            daftarKeuangan.getKategori().setName(kategori.getName());
+            int rowsAffected = daftarKeuanganRepo.update(daftarKeuangan);
+            if (rowsAffected > 0) {
+                return daftarKeuangan;
+            }
         }
+        return null;
     }
 
     public List<DaftarKeuangan> findByKategoriId(Long kategoriId) {

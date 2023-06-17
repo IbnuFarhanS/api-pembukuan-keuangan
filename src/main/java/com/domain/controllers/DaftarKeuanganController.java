@@ -53,7 +53,12 @@ public class DaftarKeuanganController {
     public DaftarKeuangan update(@PathVariable("id") Long id, @RequestBody DaftarKeuangan daftarKeuangan) {
         DaftarKeuangan existingDaftarKeuangan = daftarKeuanganService.findById(id).orElse(null);
         if (existingDaftarKeuangan != null) {
-            existingDaftarKeuangan.setKategori(daftarKeuangan.getKategori());
+            Kategori kategori = daftarKeuangan.getKategori();
+            if (kategori != null) {
+                Kategori existingKategori = existingDaftarKeuangan.getKategori();
+                existingKategori.setId(kategori.getId());
+                existingKategori.setName(kategori.getName()); // Tambahkan baris ini untuk memperbarui nama kategori
+            }
             existingDaftarKeuangan.setAmount(daftarKeuangan.getAmount());
             existingDaftarKeuangan.setDate(daftarKeuangan.getDate());
             return daftarKeuanganService.update(existingDaftarKeuangan);
@@ -69,7 +74,7 @@ public class DaftarKeuanganController {
     }
 
     @GetMapping("/kategori/{kategoriId}")
-    public List<DaftarKeuangan> findByKategoriId(@PathVariable("kategoriId") Long kategoriId) {
+    public List<DaftarKeuangan> findByKategoriId(@PathVariable Long kategoriId) {
         return daftarKeuanganService.findByKategoriId(kategoriId);
     }
 
