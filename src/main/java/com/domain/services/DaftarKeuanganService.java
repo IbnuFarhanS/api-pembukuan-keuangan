@@ -3,7 +3,6 @@ package com.domain.services;
 import com.domain.models.entities.DaftarKeuangan;
 import com.domain.models.entities.Kategori;
 import com.domain.models.repos.DaftarKeuanganRepo;
-import com.domain.models.repos.KategoriRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
