@@ -15,6 +15,7 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/api/kategori").permitAll()
                 .antMatchers("/api/kategori/{id}").permitAll()
+                .antMatchers("/api/kategori/findByName/{name}").permitAll()
 
                 .antMatchers("/api/daftar-keuangan").permitAll()
                 .antMatchers("/api/daftar-keuangan/{id}").permitAll()

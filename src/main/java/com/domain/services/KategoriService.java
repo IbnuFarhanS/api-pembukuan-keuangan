@@ -24,7 +24,19 @@ public class KategoriService {
         this.kategoriRepo = kategoriRepo;
     }
 
+    public List<Kategori> findByNameContains(String name) {
+        List<Kategori> kategoris = kategoriRepo.findByNameContains(name);
+        if (kategoris.isEmpty()) {
+            throw new IllegalArgumentException("Kategori '" + name + "'  tidak ditemukan.");
+        }
+        return kategoris;
+    }
+
     public Kategori save(Kategori kategori) {
+        String name = kategori.getName();
+        if (kategoriRepo.existsByName(name)) {
+            throw new IllegalArgumentException("Nama kategori '" + name + "' sudah digunakan.");
+        }
         return kategoriRepo.save(kategori);
     }
 
@@ -47,11 +59,16 @@ public class KategoriService {
     }
 
     public Kategori update(Kategori kategori) {
-        int rowsAffected = kategoriRepo.update(kategori);
-        if (rowsAffected > 0) {
-            return kategori;
+        Optional<Kategori> existingKategori = kategoriRepo.findById(kategori.getId());
+        if (existingKategori.isPresent()) {
+            int rowsAffected = kategoriRepo.update(kategori);
+            if (rowsAffected > 0) {
+                return kategori;
+            } else {
+                throw new IllegalStateException("Gagal memperbarui kategori.");
+            }
         } else {
-            return null;
+            throw new IllegalArgumentException("Data kategori dengan ID " + kategori.getId() + " tidak ditemukan.");
         }
     }
 }

@@ -45,6 +45,13 @@ public class KategoriRepo {
         return kategori;
     }
 
+    public boolean existsByName(String name) {
+        String sql = "SELECT COUNT(*) FROM tbl_kategori WHERE name = :name";
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("name", name);
+        int count = jdbcTemplate.queryForObject(sql, params, Integer.class);
+        return count > 0;
+    }
+
     // KategoriRepo.java
     public boolean existsById(Long id) {
         String sql = "SELECT COUNT(*) FROM tbl_kategori WHERE id = :id";

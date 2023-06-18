@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,10 +29,25 @@ public class KategoriController {
         this.kategoriService = kategoriService;
     }
 
-    @PostMapping
-    public Kategori create(@RequestBody Kategori kategori) {
-        return kategoriService.save(kategori);
+    @GetMapping("/findByName/{name}")
+    public ResponseEntity<?> findByNama(@PathVariable String name) {
+        try {
+            return ResponseEntity.ok(kategoriService.findByNameContains(name));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody Kategori kategori) {
+        try {
+            Kategori createdKategori = kategoriService.save(kategori);
+            return ResponseEntity.ok(createdKategori);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
     @GetMapping
     public List<Kategori> findAll() {
@@ -39,20 +55,32 @@ public class KategoriController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Kategori> findID(@PathVariable("id") Long id) {
+    public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         Optional<Kategori> kategori = kategoriService.findById(id);
-        return kategori.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        if (kategori.isPresent()) {
+            return ResponseEntity.ok(kategori.get());
+        } else {
+            String errorMessage = "Data dengan ID " + id + " tidak ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
     }
 
+
     @PutMapping("/{id}")
-    public Kategori update(@PathVariable("id") Long id, @RequestBody Kategori kategori) {
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody Kategori kategori) {
         Kategori existingKategori = kategoriService.findById(id).orElse(null);
         if (existingKategori != null) {
             existingKategori.setName(kategori.getName());
-            return kategoriService.update(existingKategori);
+            Kategori updatedKategori = kategoriService.update(existingKategori);
+            if (updatedKategori != null) {
+                return ResponseEntity.ok(updatedKategori);
+            } else {
+                String errorMessage = "Gagal memperbarui kategori.";
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            }
         } else {
-            return null;
+            String errorMessage = "Data dengan ID " + id + " tidak ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
 
