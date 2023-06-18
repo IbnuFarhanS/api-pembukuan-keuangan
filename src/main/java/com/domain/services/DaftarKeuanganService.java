@@ -8,6 +8,7 @@ import com.domain.models.repos.DaftarKeuanganRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +41,11 @@ public class DaftarKeuanganService {
             daftarKeuangan.setPengguna(pengguna.get());
         } else {
             throw new IllegalArgumentException("Pengguna dengan ID " + penggunaId + " tidak ditemukan.");
+        }
+
+        BigDecimal amount = daftarKeuangan.getAmount();
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount harus lebih besar dari 0.");
         }
 
         DaftarKeuangan savedDaftarKeuangan = daftarKeuanganRepo.save(daftarKeuangan);
@@ -80,6 +86,12 @@ public class DaftarKeuanganService {
         daftarKeuangan.getPengguna().setNamaPengguna(pengguna.getNamaPengguna());
         daftarKeuangan.getPengguna().setEmail(pengguna.getEmail());
         daftarKeuangan.getPengguna().setPassword(pengguna.getPassword());
+
+        // Validasi Amount
+        BigDecimal amount = daftarKeuangan.getAmount();
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount harus lebih besar dari 0.");
+        }
 
         // Melakukan pembaruan
         int rowsAffected = daftarKeuanganRepo.update(daftarKeuangan);

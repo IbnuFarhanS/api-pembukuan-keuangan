@@ -1,5 +1,6 @@
 package com.domain.controllers;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,12 @@ public class DaftarKeuanganController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
 
+        BigDecimal amount = daftarKeuangan.getAmount();
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            String errorMessage = "Amount harus lebih besar dari 0.";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+
         DaftarKeuangan savedDaftarKeuangan = daftarKeuanganService.save(daftarKeuangan);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDaftarKeuangan);
     }
@@ -89,7 +96,14 @@ public class DaftarKeuanganController {
                 existingPengguna.setEmail(pengguna.getEmail());
                 existingPengguna.setPassword(pengguna.getPassword());
             }
+
+            BigDecimal amount = daftarKeuangan.getAmount();
+            if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+                String errorMessage = "Amount harus lebih besar dari 0.";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            }
             existingDaftarKeuangan.setAmount(daftarKeuangan.getAmount());
+
             existingDaftarKeuangan.setDate(daftarKeuangan.getDate());
 
             try {
