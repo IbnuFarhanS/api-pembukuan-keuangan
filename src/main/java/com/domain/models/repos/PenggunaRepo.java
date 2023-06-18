@@ -1,0 +1,84 @@
+package com.domain.models.repos;
+
+import com.domain.models.entities.Pengguna;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+@Repository
+public class PenggunaRepo {
+
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public PenggunaRepo(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public Pengguna save(Pengguna pengguna) {
+        String sql = "INSERT INTO pengguna (nama_pengguna, email, password) VALUES (:namaPengguna, :email, :password)";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("namaPengguna", pengguna.getNamaPengguna())
+                .addValue("email", pengguna.getEmail())
+                .addValue("password", pengguna.getPassword());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(sql, params, keyHolder, new String[]{"id"});
+
+        Long generatedId = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        pengguna.setId(generatedId);
+
+        return pengguna;
+    }
+
+    public List<Pengguna> findAll() {
+        String sql = "SELECT * FROM pengguna";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pengguna.class));
+    }
+
+    public Optional<Pengguna> findById(Long id) {
+        String sql = "SELECT * FROM pengguna WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id);
+        try {
+            Pengguna pengguna = jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
+            return Optional.ofNullable(pengguna);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    public void delete(Long id) {
+        String sql = "DELETE FROM pengguna WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id);
+        jdbcTemplate.update(sql, params);
+    }
+
+    public List<Pengguna> findByNamaPenggunaContains(String namaPengguna) {
+        return null;
+    }
+
+    public Pengguna update(Pengguna pengguna) {
+        String sql = "UPDATE pengguna SET nama_pengguna = :namaPengguna, email = :email, password = :password WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("namaPengguna", pengguna.getNamaPengguna())
+                .addValue("email", pengguna.getEmail())
+                .addValue("password", pengguna.getPassword())
+                .addValue("id", pengguna.getId());
+
+        jdbcTemplate.update(sql, params);
+
+        return pengguna;
+    }
+
+}
