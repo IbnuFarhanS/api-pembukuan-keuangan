@@ -24,6 +24,16 @@ public class KategoriService {
         this.kategoriRepo = kategoriRepo;
     }
 
+    public Optional<Kategori> findById(Long id) {
+        return kategoriRepo.findById(id);
+    }
+
+    public List<Kategori> findAll() {
+        Iterable<Kategori> kategoriList = kategoriRepo.findAll();
+        return StreamSupport.stream(kategoriList.spliterator(), false)
+                .collect(Collectors.toList());
+    }
+
     public List<Kategori> findByNameContains(String name) {
         List<Kategori> kategoris = kategoriRepo.findByNameContains(name);
         if (kategoris.isEmpty()) {
@@ -40,22 +50,8 @@ public class KategoriService {
         return kategoriRepo.save(kategori);
     }
 
-    public Optional<Kategori> findById(Long id) {
-        return kategoriRepo.findById(id);
-    }
-
-    public List<Kategori> findAll() {
-        Iterable<Kategori> kategoriList = kategoriRepo.findAll();
-        return StreamSupport.stream(kategoriList.spliterator(), false)
-                .collect(Collectors.toList());
-    }
-
     public void deleteById(Long id) {
         kategoriRepo.delete(id);
-    }
-
-    public List<Kategori> findByName(String name) {
-        return kategoriRepo.findByNameContains(name);
     }
 
     public Kategori update(Kategori kategori) {

@@ -24,6 +24,14 @@ public class PenggunaRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public List<Pengguna> findByNamaPenggunaContains(String namaPengguna) {
+        String sql = "SELECT * FROM pengguna WHERE nama_pengguna LIKE :namaPengguna";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("namaPengguna", "%" + namaPengguna + "%");
+
+        return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
+    }
+
     public Pengguna save(Pengguna pengguna) {
         String sql = "INSERT INTO pengguna (nama_pengguna, email, password) VALUES (:namaPengguna, :email, :password)";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -62,10 +70,6 @@ public class PenggunaRepo {
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id);
         jdbcTemplate.update(sql, params);
-    }
-
-    public List<Pengguna> findByNamaPenggunaContains(String namaPengguna) {
-        return null;
     }
 
     public Pengguna update(Pengguna pengguna) {

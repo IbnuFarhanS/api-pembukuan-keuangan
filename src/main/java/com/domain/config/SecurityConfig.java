@@ -27,6 +27,7 @@ public class SecurityConfig {
 
                 .antMatchers("/api/pengguna").permitAll()
                 .antMatchers("/api/pengguna/{id}").permitAll()
+                .antMatchers("/api/pengguna/findByNamaPengguna/{namaPengguna}").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 // Tambahkan konfigurasi autentikasi jika diperlukan

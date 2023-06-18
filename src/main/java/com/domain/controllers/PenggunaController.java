@@ -4,6 +4,7 @@ import com.domain.helpers.password.PasswordEncoderExample;
 import com.domain.models.entities.Pengguna;
 import com.domain.services.PenggunaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,15 @@ public class PenggunaController {
         this.penggunaService = penggunaService;
     }
 
+    @GetMapping("/findByNamaPengguna/{namaPengguna}")
+    public ResponseEntity<?> findByNamaPengguna(@PathVariable String namaPengguna) {
+        try {
+            return ResponseEntity.ok(penggunaService.findByNamaPenggunaContains(namaPengguna));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Pengguna> create(@RequestBody Pengguna pengguna) {
         Pengguna createdPengguna = penggunaService.save(pengguna);
@@ -28,7 +38,6 @@ public class PenggunaController {
         createdPengguna.setPassword(encryptedPassword);
         return ResponseEntity.ok(createdPengguna);
     }
-
 
     @GetMapping
     public List<Pengguna> findAll() {

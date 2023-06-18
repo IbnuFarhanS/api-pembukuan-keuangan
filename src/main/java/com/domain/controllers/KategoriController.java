@@ -48,7 +48,6 @@ public class KategoriController {
         }
     }
 
-
     @GetMapping
     public List<Kategori> findAll() {
         return kategoriService.findAll();

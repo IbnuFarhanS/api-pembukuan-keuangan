@@ -21,12 +21,6 @@ public class PenggunaService {
         this.penggunaRepo = penggunaRepo;
     }
 
-    public Pengguna save(Pengguna pengguna) {
-        String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());
-        pengguna.setPassword(encryptedPassword);
-        return penggunaRepo.save(pengguna);
-    }
-
     public Optional<Pengguna> findById(Long id) {
         return penggunaRepo.findById(id);
     }
@@ -35,12 +29,22 @@ public class PenggunaService {
         return penggunaRepo.findAll();
     }
 
-    public void deleteById(Long id) {
-        penggunaRepo.delete(id);
+    public List<Pengguna> findByNamaPenggunaContains(String namaPengguna) {
+        List<Pengguna> penggunas = penggunaRepo.findByNamaPenggunaContains(namaPengguna);
+        if (penggunas.isEmpty()) {
+            throw new IllegalArgumentException("Pengguna '" + namaPengguna + "'  tidak ditemukan.");
+        }
+        return penggunas;
     }
 
-    public List<Pengguna> findByNamaPengguna(String namaPengguna) {
-        return penggunaRepo.findByNamaPenggunaContains(namaPengguna);
+    public Pengguna save(Pengguna pengguna) {
+        String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());
+        pengguna.setPassword(encryptedPassword);
+        return penggunaRepo.save(pengguna);
+    }
+
+    public void deleteById(Long id) {
+        penggunaRepo.delete(id);
     }
 
     public Pengguna update(Pengguna pengguna) {
