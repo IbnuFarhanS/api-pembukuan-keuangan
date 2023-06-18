@@ -43,13 +43,6 @@ public class DaftarKeuanganRepo {
         return daftarKeuangan;
     }
 
-    // public boolean existsById(Long id) {
-    //     String sql = "SELECT COUNT(*) FROM daftar_keuangan WHERE id = :id";
-    //     MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
-    //     Integer count = jdbcTemplate.queryForObject(sql, params, Integer.class);
-    //     return count != null && count > 0;
-    // }
-
     public void delete(Long id) {
         String sql = "DELETE FROM daftar_keuangan WHERE id = :id";
         jdbcTemplate.update(sql, Collections.singletonMap("id", id));
