@@ -20,6 +20,10 @@ public class Pengguna {
     public Pengguna() {
     }
 
+    public Pengguna(Long id) {
+        this.id = id;
+    }
+
     public Pengguna(String namaPengguna, String email, String password) {
         this.namaPengguna = namaPengguna;
         this.email = email;

@@ -2,6 +2,7 @@ package com.domain.services;
 
 import com.domain.models.entities.DaftarKeuangan;
 import com.domain.models.entities.Kategori;
+import com.domain.models.entities.Pengguna;
 import com.domain.models.repos.DaftarKeuanganRepo;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,28 +16,42 @@ public class DaftarKeuanganService {
 
     private final DaftarKeuanganRepo daftarKeuanganRepo;
     private final KategoriService kategoriService;
+    private final PenggunaService penggunaService;
 
     @Autowired
-    public DaftarKeuanganService(DaftarKeuanganRepo daftarKeuanganRepo, KategoriService kategoriService) {
+    public DaftarKeuanganService(DaftarKeuanganRepo daftarKeuanganRepo, KategoriService kategoriService, PenggunaService penggunaService) {
         this.daftarKeuanganRepo = daftarKeuanganRepo;
         this.kategoriService = kategoriService;
+        this.penggunaService = penggunaService;
     }
 
     public DaftarKeuangan save(DaftarKeuangan daftarKeuangan) {
-        // Memastikan bahwa kategori dengan kategoriId tersedia di tbl_kategori
         Long kategoriId = daftarKeuangan.getKategori().getId();
         Optional<Kategori> kategori = kategoriService.findById(kategoriId);
         if (kategori.isPresent()) {
             daftarKeuangan.setKategori(kategori.get());
-            return daftarKeuanganRepo.save(daftarKeuangan);
         } else {
-            // Kategori tidak ditemukan, Anda dapat mengambil tindakan yang sesuai (misalnya, lempar Exception)
             throw new IllegalArgumentException("Kategori dengan ID " + kategoriId + " tidak ditemukan.");
         }
+
+        Long penggunaId = daftarKeuangan.getPengguna().getId();
+        Optional<Pengguna> pengguna = penggunaService.findById(penggunaId);
+        if (pengguna.isPresent()) {
+            daftarKeuangan.setPengguna(pengguna.get());
+        } else {
+            throw new IllegalArgumentException("Pengguna dengan ID " + penggunaId + " tidak ditemukan.");
+        }
+
+        DaftarKeuangan savedDaftarKeuangan = daftarKeuanganRepo.save(daftarKeuangan);
+        return savedDaftarKeuangan;
     }
 
     public Optional<DaftarKeuangan> findById(Long id) {
-        return Optional.ofNullable(daftarKeuanganRepo.findById(id));
+        Optional<DaftarKeuangan> daftarKeuangan = Optional.ofNullable(daftarKeuanganRepo.findById(id));
+        if (!daftarKeuangan.isPresent()) {
+            System.out.println("ID tidak ditemukan");
+        }
+        return daftarKeuangan;
     }
 
     public List<DaftarKeuangan> findAll() {
@@ -48,15 +63,31 @@ public class DaftarKeuanganService {
     }
 
     public DaftarKeuangan update(DaftarKeuangan daftarKeuangan) {
-        Kategori kategori = kategoriService.findById(daftarKeuangan.getKategori().getId()).orElse(null);
-        if (kategori != null) {
-            daftarKeuangan.getKategori().setName(kategori.getName());
-            int rowsAffected = daftarKeuanganRepo.update(daftarKeuangan);
-            if (rowsAffected > 0) {
-                return daftarKeuangan;
-            }
+        // Validasi Kategori
+        Long kategoriId = daftarKeuangan.getKategori().getId();
+        Kategori kategori = kategoriService.findById(kategoriId).orElse(null);
+        if (kategori == null) {
+            throw new IllegalArgumentException("Data kategori dengan ID " + kategoriId + " tidak ditemukan.");
         }
-        return null;
+        daftarKeuangan.getKategori().setName(kategori.getName());
+
+        // Validasi Pengguna
+        Long penggunaId = daftarKeuangan.getPengguna().getId();
+        Pengguna pengguna = penggunaService.findById(penggunaId).orElse(null);
+        if (pengguna == null) {
+            throw new IllegalArgumentException("Data pengguna dengan ID " + penggunaId + " tidak ditemukan.");
+        }
+        daftarKeuangan.getPengguna().setNamaPengguna(pengguna.getNamaPengguna());
+        daftarKeuangan.getPengguna().setEmail(pengguna.getEmail());
+        daftarKeuangan.getPengguna().setPassword(pengguna.getPassword());
+
+        // Melakukan pembaruan
+        int rowsAffected = daftarKeuanganRepo.update(daftarKeuangan);
+        if (rowsAffected <= 0) {
+            throw new IllegalStateException("Gagal memperbarui daftar keuangan.");
+        }
+
+        return daftarKeuangan;
     }
 
     public List<DaftarKeuangan> findByKategoriId(Long kategoriId) {

@@ -18,6 +18,10 @@ public class DaftarKeuangan {
     @JoinColumn(name = "kategori_id")
     private Kategori kategori;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pengguna_id")
+    private Pengguna pengguna;
+
     private BigDecimal amount;
 
     private LocalDate date;
@@ -27,11 +31,17 @@ public class DaftarKeuangan {
         this.kategori = new Kategori(kategoriId);
     }
 
+    @JsonProperty("penggunaId")
+    private void setPenggunaId(Long penggunaId) {
+        this.pengguna = new Pengguna(penggunaId);
+    }
+
     public DaftarKeuangan() {
     }
 
-    public DaftarKeuangan(Kategori kategori, BigDecimal amount, LocalDate date) {
+    public DaftarKeuangan(Kategori kategori, Pengguna pengguna, BigDecimal amount, LocalDate date) {
         this.kategori = kategori;
+        this.pengguna = pengguna;
         this.amount = amount;
         this.date = date;
     }
@@ -50,6 +60,14 @@ public class DaftarKeuangan {
 
     public void setKategori(Kategori kategori) {
         this.kategori = kategori;
+    }
+
+    public Pengguna getPengguna() {
+        return pengguna;
+    }
+
+    public void setPengguna(Pengguna pengguna) {
+        this.pengguna = pengguna;
     }
 
     public BigDecimal getAmount() {
