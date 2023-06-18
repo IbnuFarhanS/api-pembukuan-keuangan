@@ -45,14 +45,18 @@ public class PenggunaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pengguna> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         Optional<Pengguna> pengguna = penggunaService.findById(id);
-        return pengguna.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        if (pengguna.isPresent()) {
+            return ResponseEntity.ok(pengguna.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Data dengan ID " + id + " tidak ditemukan.");
+        }
     }
 
     @PutMapping("/{id}")
-    public Pengguna update(@PathVariable("id") Long id, @RequestBody Pengguna pengguna) {
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody Pengguna pengguna) {
         Pengguna existingPengguna = penggunaService.findById(id).orElse(null);
         if (existingPengguna != null) {
             existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
@@ -63,9 +67,11 @@ public class PenggunaController {
                 existingPengguna.setPassword(pengguna.getPassword());
             }
 
-            return penggunaService.update(existingPengguna);
+            Pengguna updatedPengguna = penggunaService.update(existingPengguna);
+            return ResponseEntity.ok(updatedPengguna);
         } else {
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Data dengan ID " + id + " tidak ditemukan.");
         }
     }
 

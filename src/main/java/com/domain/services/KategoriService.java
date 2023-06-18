@@ -57,6 +57,11 @@ public class KategoriService {
     public Kategori update(Kategori kategori) {
         Optional<Kategori> existingKategori = kategoriRepo.findById(kategori.getId());
         if (existingKategori.isPresent()) {
+            String name = kategori.getName();
+            if (kategoriRepo.existsByName(name) && !existingKategori.get().getName().equals(name)) {
+                throw new IllegalArgumentException("Nama kategori '" + name + "' sudah digunakan.");
+            }
+
             int rowsAffected = kategoriRepo.update(kategori);
             if (rowsAffected > 0) {
                 return kategori;
@@ -66,5 +71,9 @@ public class KategoriService {
         } else {
             throw new IllegalArgumentException("Data kategori dengan ID " + kategori.getId() + " tidak ditemukan.");
         }
+    }
+
+    public boolean existsByName(String name) {
+        return kategoriRepo.existsByName(name);
     }
 }

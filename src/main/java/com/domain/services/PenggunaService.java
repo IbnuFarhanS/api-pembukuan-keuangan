@@ -48,8 +48,9 @@ public class PenggunaService {
     }
 
     public Pengguna update(Pengguna pengguna) {
-        Pengguna existingPengguna = penggunaRepo.findById(pengguna.getId()).orElse(null);
-        if (existingPengguna != null) {
+        Optional<Pengguna> existingPenggunaOpt = penggunaRepo.findById(pengguna.getId());
+        if (existingPenggunaOpt.isPresent()) {
+            Pengguna existingPengguna = existingPenggunaOpt.get();
             existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
             existingPengguna.setEmail(pengguna.getEmail());
 
@@ -61,7 +62,7 @@ public class PenggunaService {
 
             return penggunaRepo.update(existingPengguna);
         } else {
-            return null;
+            throw new IllegalArgumentException("Pengguna dengan ID '" + pengguna.getId() + "' tidak ditemukan.");
         }
     }
 }
