@@ -21,14 +21,17 @@ public class PenggunaService {
         this.penggunaRepo = penggunaRepo;
     }
 
-    public Optional<Pengguna> findById(Long id) {
-        return penggunaRepo.findById(id);
-    }
-
+    // ============================== FIND ALL ID ====================================
     public List<Pengguna> findAll() {
         return penggunaRepo.findAll();
     }
 
+    // ============================== FIND BY ID ====================================
+    public Optional<Pengguna> findById(Long id) {
+        return penggunaRepo.findById(id);
+    }
+
+    // ============================== FIND BY NAMA PENGGUNA ====================================
     public List<Pengguna> findByNamaPenggunaContains(String namaPengguna) {
         List<Pengguna> penggunas = penggunaRepo.findByNamaPenggunaContains(namaPengguna);
         if (penggunas.isEmpty()) {
@@ -37,16 +40,14 @@ public class PenggunaService {
         return penggunas;
     }
 
+    // ============================== SAVE ====================================
     public Pengguna save(Pengguna pengguna) {
         String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());
         pengguna.setPassword(encryptedPassword);
         return penggunaRepo.save(pengguna);
     }
 
-    public void deleteById(Long id) {
-        penggunaRepo.delete(id);
-    }
-
+    // ============================== UPDATE ====================================
     public Pengguna update(Pengguna pengguna) {
         Optional<Pengguna> existingPenggunaOpt = penggunaRepo.findById(pengguna.getId());
         if (existingPenggunaOpt.isPresent()) {
@@ -64,5 +65,10 @@ public class PenggunaService {
         } else {
             throw new IllegalArgumentException("Pengguna dengan ID '" + pengguna.getId() + "' tidak ditemukan.");
         }
+    }
+
+    // ============================== DELETE ====================================
+    public void deleteById(Long id) {
+        penggunaRepo.delete(id);
     }
 }

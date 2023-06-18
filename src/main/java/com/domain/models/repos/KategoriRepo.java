@@ -24,6 +24,26 @@ public class KategoriRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // ============================== FIND ALL ID ====================================
+    public List<Kategori> findAll() {
+        String sql = "SELECT * FROM tbl_kategori";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Kategori.class));
+    }
+
+    // ============================== FIND BY ID ====================================
+    public Optional<Kategori> findById(Long id) {
+        String sql = "SELECT * FROM tbl_kategori WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id);
+        try {
+            Kategori kategori = jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Kategori.class));
+            return Optional.ofNullable(kategori);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    // ============================== FIND BY NAME ====================================
     public List<Kategori> findByNameContains(String name) {
         String sql = "SELECT * FROM tbl_kategori WHERE name LIKE :name";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -31,6 +51,7 @@ public class KategoriRepo {
         return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Kategori.class));
     }
 
+    // ============================== SAVE ====================================
     public Kategori save(Kategori kategori) {
         String sql = "INSERT INTO tbl_kategori (name) VALUES (:name)";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -45,6 +66,7 @@ public class KategoriRepo {
         return kategori;
     }
 
+    // ============================== EXISTS BY NAME ====================================
     public boolean existsByName(String name) {
         String sql = "SELECT COUNT(*) FROM tbl_kategori WHERE name = :name";
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("name", name);
@@ -52,7 +74,16 @@ public class KategoriRepo {
         return count > 0;
     }
 
-    // KategoriRepo.java
+    // ============================== UPDATE ====================================
+    public int update(Kategori kategori) {
+        String sql = "UPDATE tbl_kategori SET name = :name WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("name", kategori.getName())
+                .addValue("id", kategori.getId());
+        return jdbcTemplate.update(sql, params);
+    }
+
+    // ============================== EXISTS BY ID ====================================
     public boolean existsById(Long id) {
         String sql = "SELECT COUNT(*) FROM tbl_kategori WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
@@ -60,38 +91,12 @@ public class KategoriRepo {
         return count != null && count > 0;
     }
 
-
-    // KategoriRepo.java
+    // ============================== DELETE ====================================
     public void delete(Long id) {
         if (existsById(id)) {
             String sql = "DELETE FROM tbl_kategori WHERE id = :id";
             MapSqlParameterSource params = new MapSqlParameterSource().addValue("id", id);
             jdbcTemplate.update(sql, params);
         }
-    }
-
-    public List<Kategori> findAll() {
-        String sql = "SELECT * FROM tbl_kategori";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Kategori.class));
-    }
-
-    public Optional<Kategori> findById(Long id) {
-        String sql = "SELECT * FROM tbl_kategori WHERE id = :id";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", id);
-        try {
-            Kategori kategori = jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Kategori.class));
-            return Optional.ofNullable(kategori);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    public int update(Kategori kategori) {
-        String sql = "UPDATE tbl_kategori SET name = :name WHERE id = :id";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("name", kategori.getName())
-                .addValue("id", kategori.getId());
-        return jdbcTemplate.update(sql, params);
     }
 }

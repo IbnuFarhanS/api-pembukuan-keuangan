@@ -29,11 +29,13 @@ public class KategoriController {
         this.kategoriService = kategoriService;
     }
 
+    // ============================== FIND ALL ID ====================================
     @GetMapping
     public List<Kategori> findAll() {
         return kategoriService.findAll();
     }
 
+    // ============================== FIND BY ID ====================================
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         Optional<Kategori> kategori = kategoriService.findById(id);
@@ -45,6 +47,7 @@ public class KategoriController {
         }
     }
 
+    // ============================== FIND BY NAME ====================================
     @GetMapping("/findByName/{name}")
     public ResponseEntity<?> findByNama(@PathVariable String name) {
         try {
@@ -54,8 +57,9 @@ public class KategoriController {
         }
     }
 
+    // ============================== SAVE ====================================
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Kategori kategori) {
+    public ResponseEntity<?> save(@RequestBody Kategori kategori) {
         try {
             Kategori createdKategori = kategoriService.save(kategori);
             return ResponseEntity.ok(createdKategori);
@@ -64,31 +68,31 @@ public class KategoriController {
         }
     }
 
+    // ============================== UPDATE ====================================
     @PutMapping("/{id}")
-public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody Kategori kategori) {
-    Kategori existingKategori = kategoriService.findById(id).orElse(null);
-    if (existingKategori != null) {
-        String name = kategori.getName();
-        if (kategoriService.existsByName(name) && !name.equals(existingKategori.getName())) {
-            String errorMessage = "Nama kategori '" + name + "' sudah digunakan.";
-            return ResponseEntity.badRequest().body(errorMessage);
-        }
-        existingKategori.setName(name);
-        Kategori updatedKategori = kategoriService.update(existingKategori);
-        if (updatedKategori != null) {
-            return ResponseEntity.ok(updatedKategori);
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody Kategori kategori) {
+        Kategori existingKategori = kategoriService.findById(id).orElse(null);
+        if (existingKategori != null) {
+            String name = kategori.getName();
+            if (kategoriService.existsByName(name) && !name.equals(existingKategori.getName())) {
+                String errorMessage = "Nama kategori '" + name + "' sudah digunakan.";
+                return ResponseEntity.badRequest().body(errorMessage);
+            }
+            existingKategori.setName(name);
+            Kategori updatedKategori = kategoriService.update(existingKategori);
+            if (updatedKategori != null) {
+                return ResponseEntity.ok(updatedKategori);
+            } else {
+                String errorMessage = "Gagal memperbarui kategori.";
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            }
         } else {
-            String errorMessage = "Gagal memperbarui kategori.";
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            String errorMessage = "Data dengan ID " + id + " tidak ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
-    } else {
-        String errorMessage = "Data dengan ID " + id + " tidak ditemukan.";
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
     }
-}
 
-
-
+    // ============================== DELETE ====================================
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable("id") Long id) {
         kategoriService.deleteById(id);

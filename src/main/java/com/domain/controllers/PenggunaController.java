@@ -22,28 +22,13 @@ public class PenggunaController {
         this.penggunaService = penggunaService;
     }
 
-    @GetMapping("/findByNamaPengguna/{namaPengguna}")
-    public ResponseEntity<?> findByNamaPengguna(@PathVariable String namaPengguna) {
-        try {
-            return ResponseEntity.ok(penggunaService.findByNamaPenggunaContains(namaPengguna));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<Pengguna> create(@RequestBody Pengguna pengguna) {
-        Pengguna createdPengguna = penggunaService.save(pengguna);
-        String encryptedPassword = PasswordEncoderExample.encodePassword(createdPengguna.getPassword());
-        createdPengguna.setPassword(encryptedPassword);
-        return ResponseEntity.ok(createdPengguna);
-    }
-
+    // ============================== FIND ALL ID ====================================
     @GetMapping
     public List<Pengguna> findAll() {
         return penggunaService.findAll();
     }
 
+    // ============================== FIND BY ID ====================================
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id) {
         Optional<Pengguna> pengguna = penggunaService.findById(id);
@@ -55,6 +40,26 @@ public class PenggunaController {
         }
     }
 
+    // ============================== FIND BY NAMA PENGGUNA ====================================
+    @GetMapping("/findByNamaPengguna/{namaPengguna}")
+    public ResponseEntity<?> findByNamaPengguna(@PathVariable String namaPengguna) {
+        try {
+            return ResponseEntity.ok(penggunaService.findByNamaPenggunaContains(namaPengguna));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    // ============================== SAVE ====================================
+    @PostMapping
+    public ResponseEntity<Pengguna> save(@RequestBody Pengguna pengguna) {
+        Pengguna createdPengguna = penggunaService.save(pengguna);
+        String encryptedPassword = PasswordEncoderExample.encodePassword(createdPengguna.getPassword());
+        createdPengguna.setPassword(encryptedPassword);
+        return ResponseEntity.ok(createdPengguna);
+    }
+
+    // ============================== UPDATE ====================================
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody Pengguna pengguna) {
         Pengguna existingPengguna = penggunaService.findById(id).orElse(null);
@@ -75,6 +80,7 @@ public class PenggunaController {
         }
     }
 
+    // ============================== DELETE ====================================
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable("id") Long id) {
         penggunaService.deleteById(id);

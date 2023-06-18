@@ -11,8 +11,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class DaftarKeuanganRepo {
@@ -24,30 +28,7 @@ public class DaftarKeuanganRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public DaftarKeuangan save(DaftarKeuangan daftarKeuangan) {
-        String sql = "INSERT INTO daftar_keuangan (kategori_id, pengguna_id, amount, date) VALUES (:kategoriId, :penggunaId, :amount, :date)";
-
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("kategoriId", daftarKeuangan.getKategori().getId())
-                .addValue("penggunaId", daftarKeuangan.getPengguna().getId())
-                .addValue("amount", daftarKeuangan.getAmount())
-                .addValue("date", daftarKeuangan.getDate());
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbcTemplate.update(sql, params, keyHolder, new String[]{"id"});
-
-        Long generatedId = keyHolder.getKey().longValue();
-        daftarKeuangan.setId(generatedId);
-
-        return daftarKeuangan;
-    }
-
-    public void delete(Long id) {
-        String sql = "DELETE FROM daftar_keuangan WHERE id = :id";
-        jdbcTemplate.update(sql, Collections.singletonMap("id", id));
-    }
-
+    // ============================== FIND ALL ID ====================================
     public List<DaftarKeuangan> findAll() {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -75,6 +56,7 @@ public class DaftarKeuanganRepo {
         });
     }
 
+    // ============================== FIND BY ID ====================================
     public DaftarKeuangan findById(Long id) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -107,6 +89,27 @@ public class DaftarKeuanganRepo {
         return result.isEmpty() ? null : result.get(0);
     }
 
+    // ============================== SAVE ====================================
+    public DaftarKeuangan save(DaftarKeuangan daftarKeuangan) {
+        String sql = "INSERT INTO daftar_keuangan (kategori_id, pengguna_id, amount, date) VALUES (:kategoriId, :penggunaId, :amount, :date)";
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("kategoriId", daftarKeuangan.getKategori().getId())
+                .addValue("penggunaId", daftarKeuangan.getPengguna().getId())
+                .addValue("amount", daftarKeuangan.getAmount())
+                .addValue("date", daftarKeuangan.getDate());
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(sql, params, keyHolder, new String[]{"id"});
+
+        Long generatedId = keyHolder.getKey().longValue();
+        daftarKeuangan.setId(generatedId);
+
+        return daftarKeuangan;
+    }
+
+    // ============================== UPDATE ====================================
     public int update(DaftarKeuangan daftarKeuangan) {
         String sql = "UPDATE daftar_keuangan SET kategori_id = :kategoriId, pengguna_id = :penggunaId, amount = :amount, date = :date WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -118,6 +121,13 @@ public class DaftarKeuanganRepo {
         return jdbcTemplate.update(sql, params);
     }
 
+    // ============================== DELETE ====================================
+    public void delete(Long id) {
+        String sql = "DELETE FROM daftar_keuangan WHERE id = :id";
+        jdbcTemplate.update(sql, Collections.singletonMap("id", id));
+    }
+
+    // ============================== FIND BY ID Kategori ====================================
     public List<DaftarKeuangan> findByKategoriId(Long kategoriId) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -148,6 +158,7 @@ public class DaftarKeuanganRepo {
         });
     }
 
+    // ============================== FIND BY ID Pengguna ====================================
     public List<DaftarKeuangan> findByPenggunaId(Long penggunaId) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -178,6 +189,7 @@ public class DaftarKeuanganRepo {
         });
     }
 
+    // ============================== FIND BY Amount Greater Than ====================================
     public List<DaftarKeuangan> findByAmountGreaterThan(Double amount) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -208,6 +220,7 @@ public class DaftarKeuanganRepo {
         });
     }
 
+    // ============================== FIND BY Amount Less Then ====================================
     public List<DaftarKeuangan> findByAmountLessThan(Double amount) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -238,6 +251,7 @@ public class DaftarKeuanganRepo {
         });
     }
 
+    // ============================== FIND BY DATE BETWEEN ====================================
     public List<DaftarKeuangan> findByDateBetween(String startDate, String endDate) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +
@@ -267,5 +281,17 @@ public class DaftarKeuanganRepo {
 
             return daftarKeuangan;
         });
+    }
+
+    // Pengguna Java Stream collector untuk mengelompokan amount dari kecil ke besar
+    public Map<BigDecimal, List<DaftarKeuangan>> findAllByAmountGrouped() {
+        List<DaftarKeuangan> daftarKeuangans = findAll();
+
+        return daftarKeuangans.stream()
+                .collect(Collectors.groupingBy(DaftarKeuangan::getAmount))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 }

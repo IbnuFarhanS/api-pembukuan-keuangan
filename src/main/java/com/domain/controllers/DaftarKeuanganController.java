@@ -2,6 +2,7 @@ package com.domain.controllers;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,27 @@ public class DaftarKeuanganController {
         this.penggunaService = penggunaService;
     }
 
+    // ============================== FIND ALL ID ====================================
+    @GetMapping
+    public List<DaftarKeuangan> findAll() {
+        return daftarKeuanganService.findAll();
+    }
+
+    // ============================== FIND BY ID ====================================
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findById(@PathVariable("id") Long id) {
+        Optional<DaftarKeuangan> daftarKeuangan = daftarKeuanganService.findById(id);
+        if (daftarKeuangan.isPresent()) {
+            return ResponseEntity.ok(daftarKeuangan.get());
+        } else {
+            String message = "Data dengan ID " + id + " tidak ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+        }
+    }
+
+    // ============================== SAVE ====================================
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody DaftarKeuangan daftarKeuangan) {
+    public ResponseEntity<?> save(@RequestBody DaftarKeuangan daftarKeuangan) {
         // Memastikan bahwa kategori dengan kategoriId tersedia di tbl_kategori
         Long kategoriId = daftarKeuangan.getKategori().getId();
         Optional<Kategori> kategori = kategoriService.findById(kategoriId);
@@ -62,22 +82,7 @@ public class DaftarKeuanganController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDaftarKeuangan);
     }
 
-    @GetMapping
-    public List<DaftarKeuangan> findAll() {
-        return daftarKeuanganService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable("id") Long id) {
-        Optional<DaftarKeuangan> daftarKeuangan = daftarKeuanganService.findById(id);
-        if (daftarKeuangan.isPresent()) {
-            return ResponseEntity.ok(daftarKeuangan.get());
-        } else {
-            String message = "Data dengan ID " + id + " tidak ditemukan.";
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
-        }
-    }
-
+    // ============================== UPDATE ====================================
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody DaftarKeuangan daftarKeuangan) {
         DaftarKeuangan existingDaftarKeuangan = daftarKeuanganService.findById(id).orElse(null);
@@ -122,12 +127,14 @@ public class DaftarKeuanganController {
         }
     }
 
+    // ============================== DELETE ====================================
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable("id") Long id) {
         daftarKeuanganService.deleteById(id);
         return ResponseEntity.ok("Data dengan ID " + id + " berhasil dihapus.");
     }
 
+    // ============================== FIND BY ID Kategori ====================================
     @GetMapping("/kategori/{kategoriId}")
     public ResponseEntity<?> findByKategoriId(@PathVariable Long kategoriId) {
         List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByKategoriId(kategoriId);
@@ -138,6 +145,7 @@ public class DaftarKeuanganController {
         return ResponseEntity.ok(daftarKeuanganList);
     }
 
+    // ============================== FIND BY ID Pengguna ====================================
     @GetMapping("/pengguna/{penggunaId}")
     public ResponseEntity<?> findByPenggunaId(@PathVariable Long penggunaId) {
         List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByPenggunaId(penggunaId);
@@ -148,6 +156,7 @@ public class DaftarKeuanganController {
         return ResponseEntity.ok(daftarKeuanganList);
     }
 
+    // ============================== FIND BY Amount Greater Than ====================================
     @GetMapping("/amount-greater-than/{amount}")
     public ResponseEntity<?> findByAmountGreaterThan(@PathVariable("amount") Double amount) {
         List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByAmountGreaterThan(amount);
@@ -160,6 +169,7 @@ public class DaftarKeuanganController {
         return ResponseEntity.ok(daftarKeuanganList);
     }
 
+    // ============================== FIND BY Amount Less Than ====================================
     @GetMapping("/amount-less-than/{amount}")
     public ResponseEntity<?> findByAmountLessThan(@PathVariable("amount") Double amount) {
         List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByAmountLessThan(amount);
@@ -172,6 +182,7 @@ public class DaftarKeuanganController {
         return ResponseEntity.ok(daftarKeuanganList);
     }
 
+    // ============================== FIND BY Date Between ====================================
     @GetMapping("/date-between/{startDate}/{endDate}")
     public ResponseEntity<?> findByDateBetween(
             @PathVariable("startDate") String startDate,
@@ -184,5 +195,12 @@ public class DaftarKeuanganController {
         }
 
         return ResponseEntity.ok(daftarKeuanganList);
+    }
+
+    // ============================== FIND ALL BY Amount Grouped ====================================
+    @GetMapping("/grouped-by-amount")
+    public ResponseEntity<Map<BigDecimal, List<DaftarKeuangan>>> getAllGroupedByAmount() {
+        Map<BigDecimal, List<DaftarKeuangan>> groupedByAmount = daftarKeuanganService.findAllByAmountGrouped();
+        return ResponseEntity.ok().body(groupedByAmount);
     }
 }

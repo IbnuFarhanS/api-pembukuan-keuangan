@@ -24,16 +24,19 @@ public class KategoriService {
         this.kategoriRepo = kategoriRepo;
     }
 
-    public Optional<Kategori> findById(Long id) {
-        return kategoriRepo.findById(id);
-    }
-
+    // ============================== FIND ALL ID ====================================
     public List<Kategori> findAll() {
         Iterable<Kategori> kategoriList = kategoriRepo.findAll();
         return StreamSupport.stream(kategoriList.spliterator(), false)
                 .collect(Collectors.toList());
     }
 
+    // ============================== FIND BY ID ====================================
+    public Optional<Kategori> findById(Long id) {
+        return kategoriRepo.findById(id);
+    }
+
+    // ============================== FIND BY NAME ====================================
     public List<Kategori> findByNameContains(String name) {
         List<Kategori> kategoris = kategoriRepo.findByNameContains(name);
         if (kategoris.isEmpty()) {
@@ -42,6 +45,7 @@ public class KategoriService {
         return kategoris;
     }
 
+    // ============================== SAVE ====================================
     public Kategori save(Kategori kategori) {
         String name = kategori.getName();
         if (kategoriRepo.existsByName(name)) {
@@ -50,10 +54,7 @@ public class KategoriService {
         return kategoriRepo.save(kategori);
     }
 
-    public void deleteById(Long id) {
-        kategoriRepo.delete(id);
-    }
-
+    // ============================== UPDATE ====================================
     public Kategori update(Kategori kategori) {
         Optional<Kategori> existingKategori = kategoriRepo.findById(kategori.getId());
         if (existingKategori.isPresent()) {
@@ -73,6 +74,12 @@ public class KategoriService {
         }
     }
 
+    // ============================== DELETE ====================================
+    public void deleteById(Long id) {
+        kategoriRepo.delete(id);
+    }
+
+    // ============================== EXISTS BY NAME ====================================
     public boolean existsByName(String name) {
         return kategoriRepo.existsByName(name);
     }

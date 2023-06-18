@@ -24,6 +24,26 @@ public class PenggunaRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // ============================== FIND ALL ID ====================================
+    public List<Pengguna> findAll() {
+        String sql = "SELECT * FROM pengguna";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pengguna.class));
+    }
+
+    // ============================== FIND BY ID ====================================
+    public Optional<Pengguna> findById(Long id) {
+        String sql = "SELECT * FROM pengguna WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id);
+        try {
+            Pengguna pengguna = jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
+            return Optional.ofNullable(pengguna);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    // ============================== FIND BY NAMA PENGGUNA ====================================
     public List<Pengguna> findByNamaPenggunaContains(String namaPengguna) {
         String sql = "SELECT * FROM pengguna WHERE nama_pengguna LIKE :namaPengguna";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -32,6 +52,7 @@ public class PenggunaRepo {
         return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
     }
 
+    // ============================== SAVE ====================================
     public Pengguna save(Pengguna pengguna) {
         String sql = "INSERT INTO pengguna (nama_pengguna, email, password) VALUES (:namaPengguna, :email, :password)";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -48,30 +69,7 @@ public class PenggunaRepo {
         return pengguna;
     }
 
-    public List<Pengguna> findAll() {
-        String sql = "SELECT * FROM pengguna";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Pengguna.class));
-    }
-
-    public Optional<Pengguna> findById(Long id) {
-        String sql = "SELECT * FROM pengguna WHERE id = :id";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", id);
-        try {
-            Pengguna pengguna = jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
-            return Optional.ofNullable(pengguna);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    public void delete(Long id) {
-        String sql = "DELETE FROM pengguna WHERE id = :id";
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", id);
-        jdbcTemplate.update(sql, params);
-    }
-
+    // ============================== UPDATE ====================================
     public Pengguna update(Pengguna pengguna) {
         String sql = "UPDATE pengguna SET nama_pengguna = :namaPengguna, email = :email, password = :password WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -85,4 +83,11 @@ public class PenggunaRepo {
         return pengguna;
     }
 
+    // ============================== DELETE ====================================
+    public void delete(Long id) {
+        String sql = "DELETE FROM pengguna WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", id);
+        jdbcTemplate.update(sql, params);
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,6 +27,21 @@ public class DaftarKeuanganService {
         this.penggunaService = penggunaService;
     }
 
+    // ============================== FIND ALL ID ====================================
+    public List<DaftarKeuangan> findAll() {
+        return daftarKeuanganRepo.findAll();
+    }
+
+    // ============================== FIND BY ID ====================================
+    public Optional<DaftarKeuangan> findById(Long id) {
+        Optional<DaftarKeuangan> daftarKeuangan = Optional.ofNullable(daftarKeuanganRepo.findById(id));
+        if (!daftarKeuangan.isPresent()) {
+            System.out.println("ID tidak ditemukan");
+        }
+        return daftarKeuangan;
+    }
+
+    // ============================== SAVE ====================================
     public DaftarKeuangan save(DaftarKeuangan daftarKeuangan) {
         Long kategoriId = daftarKeuangan.getKategori().getId();
         Optional<Kategori> kategori = kategoriService.findById(kategoriId);
@@ -52,22 +68,7 @@ public class DaftarKeuanganService {
         return savedDaftarKeuangan;
     }
 
-    public Optional<DaftarKeuangan> findById(Long id) {
-        Optional<DaftarKeuangan> daftarKeuangan = Optional.ofNullable(daftarKeuanganRepo.findById(id));
-        if (!daftarKeuangan.isPresent()) {
-            System.out.println("ID tidak ditemukan");
-        }
-        return daftarKeuangan;
-    }
-
-    public List<DaftarKeuangan> findAll() {
-        return daftarKeuanganRepo.findAll();
-    }
-
-    public void deleteById(Long id) {
-        daftarKeuanganRepo.delete(id);
-    }
-
+    // ============================== UPDATE ====================================
     public DaftarKeuangan update(DaftarKeuangan daftarKeuangan) {
         // Validasi Kategori
         Long kategoriId = daftarKeuangan.getKategori().getId();
@@ -102,23 +103,38 @@ public class DaftarKeuanganService {
         return daftarKeuangan;
     }
 
+    // ============================== DELETE ====================================
+    public void deleteById(Long id) {
+        daftarKeuanganRepo.delete(id);
+    }
+
+    // ============================== FIND BY ID Kategori ====================================
     public List<DaftarKeuangan> findByKategoriId(Long kategoriId) {
         return daftarKeuanganRepo.findByKategoriId(kategoriId);
     }
 
+    // ============================== FIND BY ID Pengguna ====================================
     public List<DaftarKeuangan> findByPenggunaId(Long penggunaId) {
         return daftarKeuanganRepo.findByPenggunaId(penggunaId);
     }
 
+    // ============================== FIND BY Amount Greater Than ====================================
     public List<DaftarKeuangan> findByAmountGreaterThan(Double amount) {
         return daftarKeuanganRepo.findByAmountGreaterThan(amount);
     }
 
+    // ============================== FIND BY Amount Less Than ====================================
     public List<DaftarKeuangan> findByAmountLessThan(Double amount) {
         return daftarKeuanganRepo.findByAmountLessThan(amount);
     }
 
+    // ============================== FIND BY Date Between ====================================
     public List<DaftarKeuangan> findByDateBetween(String startDate, String endDate) {
         return daftarKeuanganRepo.findByDateBetween(startDate, endDate);
+    }
+
+    // ============================== FIND ALL BY Amount Grouped ====================================
+    public Map<BigDecimal, List<DaftarKeuangan>> findAllByAmountGrouped() {
+        return daftarKeuanganRepo.findAllByAmountGrouped();
     }
 }

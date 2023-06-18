@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .antMatchers("/api/daftar-keuangan/amount-greater-than/{amount}").permitAll()
                 .antMatchers("/api/daftar-keuangan/amount-less-than/{amount}").permitAll()
                 .antMatchers("/api/daftar-keuangan/date-between/{startDate}/{endDate}").permitAll()
+                .antMatchers("/api/daftar-keuangan/grouped-by-amount").permitAll()
 
                 .antMatchers("/api/pengguna").permitAll()
                 .antMatchers("/api/pengguna/{id}").permitAll()
