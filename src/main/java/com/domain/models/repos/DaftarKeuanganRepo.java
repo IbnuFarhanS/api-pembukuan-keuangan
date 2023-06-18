@@ -155,6 +155,36 @@ public class DaftarKeuanganRepo {
         });
     }
 
+    public List<DaftarKeuangan> findByPenggunaId(Long penggunaId) {
+        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+                    "FROM daftar_keuangan dk " +
+                    "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
+                    "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "WHERE dk.pengguna_id = :penggunaId";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("penggunaId", penggunaId);
+        return jdbcTemplate.query(sql, params, (rs, rowNum) -> {
+            DaftarKeuangan daftarKeuangan = new DaftarKeuangan();
+            daftarKeuangan.setId(rs.getLong("id"));
+            daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
+            daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
+
+            Pengguna pengguna = new Pengguna();
+            pengguna.setId(rs.getLong("pengguna_id"));
+            pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setEmail(rs.getString("email"));
+            pengguna.setPassword(rs.getString("password"));
+            daftarKeuangan.setPengguna(pengguna);
+
+            return daftarKeuangan;
+        });
+    }
+
     public List<DaftarKeuangan> findByAmountGreaterThan(Double amount) {
         String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
                     "FROM daftar_keuangan dk " +

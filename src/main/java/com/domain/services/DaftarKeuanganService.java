@@ -94,6 +94,10 @@ public class DaftarKeuanganService {
         return daftarKeuanganRepo.findByKategoriId(kategoriId);
     }
 
+    public List<DaftarKeuangan> findByPenggunaId(Long penggunaId) {
+        return daftarKeuanganRepo.findByPenggunaId(penggunaId);
+    }
+
     public List<DaftarKeuangan> findByAmountGreaterThan(Double amount) {
         return daftarKeuanganRepo.findByAmountGreaterThan(amount);
     }

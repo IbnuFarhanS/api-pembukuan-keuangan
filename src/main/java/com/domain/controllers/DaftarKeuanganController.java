@@ -115,24 +115,60 @@ public class DaftarKeuanganController {
     }
 
     @GetMapping("/kategori/{kategoriId}")
-    public List<DaftarKeuangan> findByKategoriId(@PathVariable Long kategoriId) {
-        return daftarKeuanganService.findByKategoriId(kategoriId);
+    public ResponseEntity<?> findByKategoriId(@PathVariable Long kategoriId) {
+        List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByKategoriId(kategoriId);
+        if (daftarKeuanganList.isEmpty()) {
+            String errorMessage = "Tidak ada daftar keuangan dengan ID kategori " + kategoriId + " yang ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+        return ResponseEntity.ok(daftarKeuanganList);
+    }
+
+    @GetMapping("/pengguna/{penggunaId}")
+    public ResponseEntity<?> findByPenggunaId(@PathVariable Long penggunaId) {
+        List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByPenggunaId(penggunaId);
+        if (daftarKeuanganList.isEmpty()) {
+            String errorMessage = "Tidak ada daftar keuangan dengan ID pengguna " + penggunaId + " yang ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+        return ResponseEntity.ok(daftarKeuanganList);
     }
 
     @GetMapping("/amount-greater-than/{amount}")
-    public List<DaftarKeuangan> findByAmountGreaterThan(@PathVariable("amount") Double amount) {
-        return daftarKeuanganService.findByAmountGreaterThan(amount);
+    public ResponseEntity<?> findByAmountGreaterThan(@PathVariable("amount") Double amount) {
+        List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByAmountGreaterThan(amount);
+
+        if (daftarKeuanganList.isEmpty()) {
+            String errorMessage = "Tidak ada daftar keuangan dengan amount lebih besar dari " + amount + " yang ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+
+        return ResponseEntity.ok(daftarKeuanganList);
     }
 
     @GetMapping("/amount-less-than/{amount}")
-    public List<DaftarKeuangan> findByAmountLessThan(@PathVariable("amount") Double amount) {
-        return daftarKeuanganService.findByAmountLessThan(amount);
+    public ResponseEntity<?> findByAmountLessThan(@PathVariable("amount") Double amount) {
+        List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByAmountLessThan(amount);
+
+        if (daftarKeuanganList.isEmpty()) {
+            String errorMessage = "Tidak ada daftar keuangan dengan amount lebih kecil dari " + amount + " yang ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+
+        return ResponseEntity.ok(daftarKeuanganList);
     }
 
     @GetMapping("/date-between/{startDate}/{endDate}")
-    public List<DaftarKeuangan> findByDateBetween(
+    public ResponseEntity<?> findByDateBetween(
             @PathVariable("startDate") String startDate,
             @PathVariable("endDate") String endDate) {
-        return daftarKeuanganService.findByDateBetween(startDate, endDate);
+        List<DaftarKeuangan> daftarKeuanganList = daftarKeuanganService.findByDateBetween(startDate, endDate);
+
+        if (daftarKeuanganList.isEmpty()) {
+            String errorMessage = "Tidak ada daftar keuangan antara tanggal " + startDate + " dan " + endDate + " yang ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+
+        return ResponseEntity.ok(daftarKeuanganList);
     }
 }

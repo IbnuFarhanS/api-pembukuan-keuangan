@@ -19,6 +19,7 @@ public class SecurityConfig {
                 .antMatchers("/api/daftar-keuangan").permitAll()
                 .antMatchers("/api/daftar-keuangan/{id}").permitAll()
                 .antMatchers("/api/daftar-keuangan/kategori/{kategoriId}").permitAll()
+                .antMatchers("/api/daftar-keuangan/pengguna/{penggunaId}").permitAll()
                 .antMatchers("/api/daftar-keuangan/amount-greater-than/{amount}").permitAll()
                 .antMatchers("/api/daftar-keuangan/amount-less-than/{amount}").permitAll()
                 .antMatchers("/api/daftar-keuangan/date-between/{startDate}/{endDate}").permitAll()
