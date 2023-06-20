@@ -1,5 +1,6 @@
 package com.domain.services;
 
+import com.domain.models.entities.Customer;
 import com.domain.models.entities.DaftarKeuangan;
 import com.domain.models.entities.Kategori;
 import com.domain.models.entities.Pengguna;
@@ -17,14 +18,16 @@ import java.util.Optional;
 public class DaftarKeuanganService {
 
     private final DaftarKeuanganRepo daftarKeuanganRepo;
-    private final KategoriService kategoriService;
     private final PenggunaService penggunaService;
+    private final CustomerService customerService;
+    private final KategoriService kategoriService;
 
     @Autowired
-    public DaftarKeuanganService(DaftarKeuanganRepo daftarKeuanganRepo, KategoriService kategoriService, PenggunaService penggunaService) {
+    public DaftarKeuanganService(DaftarKeuanganRepo daftarKeuanganRepo, PenggunaService penggunaService, CustomerService customerService, KategoriService kategoriService) {
         this.daftarKeuanganRepo = daftarKeuanganRepo;
-        this.kategoriService = kategoriService;
         this.penggunaService = penggunaService;
+        this.customerService = customerService;
+        this.kategoriService = kategoriService;
     }
 
     // ============================== FIND ALL ID ====================================
@@ -43,20 +46,28 @@ public class DaftarKeuanganService {
 
     // ============================== SAVE ====================================
     public DaftarKeuangan save(DaftarKeuangan daftarKeuangan) {
-        Long kategoriId = daftarKeuangan.getKategori().getId();
-        Optional<Kategori> kategori = kategoriService.findById(kategoriId);
-        if (kategori.isPresent()) {
-            daftarKeuangan.setKategori(kategori.get());
-        } else {
-            throw new IllegalArgumentException("Kategori dengan ID " + kategoriId + " tidak ditemukan.");
-        }
-
         Long penggunaId = daftarKeuangan.getPengguna().getId();
         Optional<Pengguna> pengguna = penggunaService.findById(penggunaId);
         if (pengguna.isPresent()) {
             daftarKeuangan.setPengguna(pengguna.get());
         } else {
             throw new IllegalArgumentException("Pengguna dengan ID " + penggunaId + " tidak ditemukan.");
+        }
+
+        Long customerId = daftarKeuangan.getCustomer().getId();
+        Optional<Customer> customer = customerService.findById(customerId);
+        if (customer.isPresent()) {
+            daftarKeuangan.setCustomer(customer.get());
+        } else {
+            throw new IllegalArgumentException("Customer dengan ID " + customerId + " tidak ditemukan.");
+        }
+
+        Long kategoriId = daftarKeuangan.getKategori().getId();
+        Optional<Kategori> kategori = kategoriService.findById(kategoriId);
+        if (kategori.isPresent()) {
+            daftarKeuangan.setKategori(kategori.get());
+        } else {
+            throw new IllegalArgumentException("Kategori dengan ID " + kategoriId + " tidak ditemukan.");
         }
 
         BigDecimal amount = daftarKeuangan.getAmount();
@@ -70,14 +81,6 @@ public class DaftarKeuanganService {
 
     // ============================== UPDATE ====================================
     public DaftarKeuangan update(DaftarKeuangan daftarKeuangan) {
-        // Validasi Kategori
-        Long kategoriId = daftarKeuangan.getKategori().getId();
-        Kategori kategori = kategoriService.findById(kategoriId).orElse(null);
-        if (kategori == null) {
-            throw new IllegalArgumentException("Data kategori dengan ID " + kategoriId + " tidak ditemukan.");
-        }
-        daftarKeuangan.getKategori().setName(kategori.getName());
-
         // Validasi Pengguna
         Long penggunaId = daftarKeuangan.getPengguna().getId();
         Pengguna pengguna = penggunaService.findById(penggunaId).orElse(null);
@@ -87,6 +90,24 @@ public class DaftarKeuanganService {
         daftarKeuangan.getPengguna().setNamaPengguna(pengguna.getNamaPengguna());
         daftarKeuangan.getPengguna().setEmail(pengguna.getEmail());
         daftarKeuangan.getPengguna().setPassword(pengguna.getPassword());
+
+        // Validasi Customer
+        Long customerId = daftarKeuangan.getCustomer().getId();
+        Customer customer = customerService.findById(customerId).orElse(null);
+        if (customer == null) {
+            throw new IllegalArgumentException("Data customer dengan ID " + customerId + " tidak ditemukan.");
+        }
+        daftarKeuangan.getCustomer().setNamaCustomer(customer.getNamaCustomer());
+        daftarKeuangan.getCustomer().setNomor(customer.getNomor());
+        daftarKeuangan.getCustomer().setAlamat(customer.getAlamat());
+
+        // Validasi Kategori
+        Long kategoriId = daftarKeuangan.getKategori().getId();
+        Kategori kategori = kategoriService.findById(kategoriId).orElse(null);
+        if (kategori == null) {
+            throw new IllegalArgumentException("Data kategori dengan ID " + kategoriId + " tidak ditemukan.");
+        }
+        daftarKeuangan.getKategori().setName(kategori.getName());
 
         // Validasi Amount
         BigDecimal amount = daftarKeuangan.getAmount();

@@ -1,5 +1,6 @@
 package com.domain.models.repos;
 
+import com.domain.models.entities.Customer;
 import com.domain.models.entities.DaftarKeuangan;
 import com.domain.models.entities.Kategori;
 import com.domain.models.entities.Pengguna;
@@ -30,20 +31,16 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND ALL ID ====================================
     public List<DaftarKeuangan> findAll() {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
-                    "JOIN pengguna p ON dk.pengguna_id = p.id";
+                    "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             DaftarKeuangan daftarKeuangan = new DaftarKeuangan();
             daftarKeuangan.setId(rs.getLong("id"));
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
-
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
 
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
@@ -52,16 +49,29 @@ public class DaftarKeuanganRepo {
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
 
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
+
             return daftarKeuangan;
         });
     }
 
     // ============================== FIND BY ID ====================================
     public DaftarKeuangan findById(Long id) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
-                    "JOIN pengguna p ON dk.pengguna_id = p.id " + // Tambahkan spasi sebelum "WHERE"
+                    "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id " +
                     "WHERE dk.id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("id", id);
@@ -72,17 +82,24 @@ public class DaftarKeuanganRepo {
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
 
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
-
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
+
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
 
             return daftarKeuangan;
         });
@@ -91,11 +108,12 @@ public class DaftarKeuanganRepo {
 
     // ============================== SAVE ====================================
     public DaftarKeuangan save(DaftarKeuangan daftarKeuangan) {
-        String sql = "INSERT INTO daftar_keuangan (kategori_id, pengguna_id, amount, date) VALUES (:kategoriId, :penggunaId, :amount, :date)";
+        String sql = "INSERT INTO daftar_keuangan (pengguna_id, customer_id, kategori_id, amount, date) VALUES (:penggunaId, :customerId, :kategoriId, :amount, :date)";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("kategoriId", daftarKeuangan.getKategori().getId())
                 .addValue("penggunaId", daftarKeuangan.getPengguna().getId())
+                .addValue("customerId", daftarKeuangan.getCustomer().getId())
+                .addValue("kategoriId", daftarKeuangan.getKategori().getId())
                 .addValue("amount", daftarKeuangan.getAmount())
                 .addValue("date", daftarKeuangan.getDate());
 
@@ -111,10 +129,11 @@ public class DaftarKeuanganRepo {
 
     // ============================== UPDATE ====================================
     public int update(DaftarKeuangan daftarKeuangan) {
-        String sql = "UPDATE daftar_keuangan SET kategori_id = :kategoriId, pengguna_id = :penggunaId, amount = :amount, date = :date WHERE id = :id";
+        String sql = "UPDATE daftar_keuangan SET pengguna_id = :penggunaId, customer_id = :customerId, kategori_id = :kategoriId, amount = :amount, date = :date WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("kategoriId", daftarKeuangan.getKategori().getId())
                 .addValue("penggunaId", daftarKeuangan.getPengguna().getId())
+                .addValue("customerId", daftarKeuangan.getCustomer().getId())
+                .addValue("kategoriId", daftarKeuangan.getKategori().getId())
                 .addValue("amount", daftarKeuangan.getAmount())
                 .addValue("date", daftarKeuangan.getDate())
                 .addValue("id", daftarKeuangan.getId());
@@ -129,10 +148,11 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY ID Kategori ====================================
     public List<DaftarKeuangan> findByKategoriId(Long kategoriId) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id " +
                     "WHERE dk.kategori_id = :kategoriId";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("kategoriId", kategoriId);
@@ -142,11 +162,6 @@ public class DaftarKeuanganRepo {
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
 
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
-
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
@@ -154,16 +169,29 @@ public class DaftarKeuanganRepo {
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
 
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
+
             return daftarKeuangan;
         });
     }
 
     // ============================== FIND BY ID Pengguna ====================================
     public List<DaftarKeuangan> findByPenggunaId(Long penggunaId) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id " +
                     "WHERE dk.pengguna_id = :penggunaId";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("penggunaId", penggunaId);
@@ -173,11 +201,6 @@ public class DaftarKeuanganRepo {
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
 
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
-
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
@@ -185,16 +208,29 @@ public class DaftarKeuanganRepo {
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
 
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
+
             return daftarKeuangan;
         });
     }
 
     // ============================== FIND BY Amount Greater Than ====================================
     public List<DaftarKeuangan> findByAmountGreaterThan(Double amount) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id " +
                     "WHERE dk.amount > :amount";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("amount", amount);
@@ -204,11 +240,6 @@ public class DaftarKeuanganRepo {
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
 
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
-
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
@@ -216,16 +247,29 @@ public class DaftarKeuanganRepo {
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
 
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
+
             return daftarKeuangan;
         });
     }
 
     // ============================== FIND BY Amount Less Then ====================================
     public List<DaftarKeuangan> findByAmountLessThan(Double amount) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id " +
                     "WHERE dk.amount < :amount";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("amount", amount);
@@ -235,11 +279,6 @@ public class DaftarKeuanganRepo {
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
 
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
-
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
@@ -247,16 +286,29 @@ public class DaftarKeuanganRepo {
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
 
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
+
             return daftarKeuangan;
         });
     }
 
     // ============================== FIND BY DATE BETWEEN ====================================
     public List<DaftarKeuangan> findByDateBetween(String startDate, String endDate) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, k.id AS kategori_id, k.name AS kategori_name, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
+                    "JOIN customer c ON dk.customer_id = c.id " +
                     "WHERE dk.date BETWEEN CAST(:startDate AS DATE) AND CAST(:endDate AS DATE)";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("startDate", startDate)
@@ -267,17 +319,24 @@ public class DaftarKeuanganRepo {
             daftarKeuangan.setAmount(rs.getBigDecimal("amount"));
             daftarKeuangan.setDate(rs.getDate("date").toLocalDate());
 
-            Kategori kategori = new Kategori();
-            kategori.setId(rs.getLong("kategori_id"));
-            kategori.setName(rs.getString("kategori_name"));
-            daftarKeuangan.setKategori(kategori);
-
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
+
+            Customer customer = new Customer();
+            customer.setId(rs.getLong("customer_id"));
+            customer.setNamaCustomer(rs.getString("nama_customer"));
+            customer.setNomor(rs.getString("nomor"));
+            customer.setAlamat(rs.getString("alamat"));
+            daftarKeuangan.setCustomer(customer);
+
+            Kategori kategori = new Kategori();
+            kategori.setId(rs.getLong("kategori_id"));
+            kategori.setName(rs.getString("kategori_name"));
+            daftarKeuangan.setKategori(kategori);
 
             return daftarKeuangan;
         });

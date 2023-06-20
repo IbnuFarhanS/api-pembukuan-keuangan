@@ -15,33 +15,43 @@ public class DaftarKeuangan {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kategori_id")
-    private Kategori kategori;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pengguna_id")
     private Pengguna pengguna;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "kategori_id")
+    private Kategori kategori;
 
     private BigDecimal amount;
 
     private LocalDate date;
-
-    @JsonProperty("kategoriId")
-    private void setKategoriId(Long kategoriId) {
-        this.kategori = new Kategori(kategoriId);
-    }
 
     @JsonProperty("penggunaId")
     private void setPenggunaId(Long penggunaId) {
         this.pengguna = new Pengguna(penggunaId);
     }
 
+    @JsonProperty("customerId")
+    private void setCustomerId(Long customerId) {
+        this.customer = new Customer(customerId);
+    }
+
+    @JsonProperty("kategoriId")
+    private void setKategoriId(Long kategoriId) {
+        this.kategori = new Kategori(kategoriId);
+    }
+
     public DaftarKeuangan() {
     }
 
-    public DaftarKeuangan(Kategori kategori, Pengguna pengguna, BigDecimal amount, LocalDate date) {
-        this.kategori = kategori;
+    public DaftarKeuangan(Pengguna pengguna, Customer customer, Kategori kategori, BigDecimal amount, LocalDate date) {
         this.pengguna = pengguna;
+        this.customer = customer;
+        this.kategori = kategori;
         this.amount = amount;
         this.date = date;
     }
@@ -54,20 +64,28 @@ public class DaftarKeuangan {
         this.id = id;
     }
 
-    public Kategori getKategori() {
-        return kategori;
-    }
-
-    public void setKategori(Kategori kategori) {
-        this.kategori = kategori;
-    }
-
     public Pengguna getPengguna() {
         return pengguna;
     }
 
     public void setPengguna(Pengguna pengguna) {
         this.pengguna = pengguna;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Kategori getKategori() {
+        return kategori;
+    }
+
+    public void setKategori(Kategori kategori) {
+        this.kategori = kategori;
     }
 
     public BigDecimal getAmount() {

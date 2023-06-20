@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.domain.models.entities.Customer;
 import com.domain.models.entities.DaftarKeuangan;
 import com.domain.models.entities.Kategori;
 import com.domain.models.entities.Pengguna;
+import com.domain.services.CustomerService;
 import com.domain.services.DaftarKeuanganService;
 import com.domain.services.KategoriService;
 import com.domain.services.PenggunaService;
@@ -21,14 +23,16 @@ import com.domain.services.PenggunaService;
 @RequestMapping("/api/daftar-keuangan")
 public class DaftarKeuanganController {
     private final DaftarKeuanganService daftarKeuanganService;
-    private final KategoriService kategoriService;
     private final PenggunaService penggunaService;
+    private final CustomerService customerService;
+    private final KategoriService kategoriService;
 
     @Autowired
-    public DaftarKeuanganController(DaftarKeuanganService daftarKeuanganService, KategoriService kategoriService, PenggunaService penggunaService) {
+    public DaftarKeuanganController(DaftarKeuanganService daftarKeuanganService, PenggunaService penggunaService, CustomerService customerService, KategoriService kategoriService) {
         this.daftarKeuanganService = daftarKeuanganService;
-        this.kategoriService = kategoriService;
         this.penggunaService = penggunaService;
+        this.customerService = customerService;
+        this.kategoriService = kategoriService;
     }
 
     // ============================== FIND ALL ID ====================================
@@ -52,16 +56,6 @@ public class DaftarKeuanganController {
     // ============================== SAVE ====================================
     @PostMapping
     public ResponseEntity<?> save(@RequestBody DaftarKeuangan daftarKeuangan) {
-        // Memastikan bahwa kategori dengan kategoriId tersedia di tbl_kategori
-        Long kategoriId = daftarKeuangan.getKategori().getId();
-        Optional<Kategori> kategori = kategoriService.findById(kategoriId);
-        if (kategori.isPresent()) {
-            daftarKeuangan.setKategori(kategori.get()); // Set objek Kategori
-        } else {
-            String errorMessage = "Data kategori ID " + kategoriId + " tidak ditemukan.";
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
-        }
-
         // Memastikan bahwa pengguna dengan penggunaId tersedia di tabel pengguna
         Long penggunaId = daftarKeuangan.getPengguna().getId();
         Optional<Pengguna> pengguna = penggunaService.findById(penggunaId);
@@ -69,6 +63,26 @@ public class DaftarKeuanganController {
             daftarKeuangan.setPengguna(pengguna.get()); // Set objek Pengguna
         } else {
             String errorMessage = "Data pengguna ID " + penggunaId + " tidak ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+
+        // Memastikan bahwa customer dengan customerId tersedia di tabel customer
+        Long customerId = daftarKeuangan.getCustomer().getId();
+        Optional<Customer> customer = customerService.findById(customerId);
+        if (customer.isPresent()) {
+            daftarKeuangan.setCustomer(customer.get()); // Set objek Customer
+        } else {
+            String errorMessage = "Data customer ID " + customerId + " tidak ditemukan.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+
+        // Memastikan bahwa kategori dengan kategoriId tersedia di tbl_kategori
+        Long kategoriId = daftarKeuangan.getKategori().getId();
+        Optional<Kategori> kategori = kategoriService.findById(kategoriId);
+        if (kategori.isPresent()) {
+            daftarKeuangan.setKategori(kategori.get()); // Set objek Kategori
+        } else {
+            String errorMessage = "Data kategori ID " + kategoriId + " tidak ditemukan.";
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
 
@@ -87,12 +101,6 @@ public class DaftarKeuanganController {
     public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody DaftarKeuangan daftarKeuangan) {
         DaftarKeuangan existingDaftarKeuangan = daftarKeuanganService.findById(id).orElse(null);
         if (existingDaftarKeuangan != null) {
-            Kategori kategori = daftarKeuangan.getKategori();
-            if (kategori != null) {
-                Kategori existingKategori = existingDaftarKeuangan.getKategori();
-                existingKategori.setId(kategori.getId());
-                existingKategori.setName(kategori.getName());
-            }
             Pengguna pengguna = daftarKeuangan.getPengguna();
             if (pengguna != null) {
                 Pengguna existingPengguna = existingDaftarKeuangan.getPengguna();
@@ -100,6 +108,22 @@ public class DaftarKeuanganController {
                 existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
                 existingPengguna.setEmail(pengguna.getEmail());
                 existingPengguna.setPassword(pengguna.getPassword());
+            }
+
+            Customer customer = daftarKeuangan.getCustomer();
+            if (customer != null) {
+                Customer existingCustomer = existingDaftarKeuangan.getCustomer();
+                existingCustomer.setId(customer.getId());
+                existingCustomer.setNamaCustomer(customer.getNamaCustomer());
+                existingCustomer.setNomor(customer.getNomor());
+                existingCustomer.setAlamat(customer.getAlamat());
+            }
+
+            Kategori kategori = daftarKeuangan.getKategori();
+            if (kategori != null) {
+                Kategori existingKategori = existingDaftarKeuangan.getKategori();
+                existingKategori.setId(kategori.getId());
+                existingKategori.setName(kategori.getName());
             }
 
             BigDecimal amount = daftarKeuangan.getAmount();
