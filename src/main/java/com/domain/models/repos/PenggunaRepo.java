@@ -52,11 +52,25 @@ public class PenggunaRepo {
         return jdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
     }
 
+    // ============================== FIND BY USERNAME ====================================
+    public Pengguna findByUsername(String username) {
+        String sql = "SELECT * FROM pengguna WHERE username = :username";
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("username", username);
+
+        try {
+            return jdbcTemplate.queryForObject(sql, params, new BeanPropertyRowMapper<>(Pengguna.class));
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     // ============================== SAVE ====================================
     public Pengguna save(Pengguna pengguna) {
-        String sql = "INSERT INTO pengguna (nama_pengguna, email, password) VALUES (:namaPengguna, :email, :password)";
+        String sql = "INSERT INTO pengguna (nama_pengguna, username, email, password) VALUES (:namaPengguna, :username, :email, :password)";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("namaPengguna", pengguna.getNamaPengguna())
+                .addValue("username", pengguna.getUsername())
                 .addValue("email", pengguna.getEmail())
                 .addValue("password", pengguna.getPassword());
 
@@ -71,9 +85,10 @@ public class PenggunaRepo {
 
     // ============================== UPDATE ====================================
     public Pengguna update(Pengguna pengguna) {
-        String sql = "UPDATE pengguna SET nama_pengguna = :namaPengguna, email = :email, password = :password WHERE id = :id";
+        String sql = "UPDATE pengguna SET nama_pengguna = :namaPengguna, username = :username, email = :email, password = :password WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("namaPengguna", pengguna.getNamaPengguna())
+                .addValue("username", pengguna.getUsername())
                 .addValue("email", pengguna.getEmail())
                 .addValue("password", pengguna.getPassword())
                 .addValue("id", pengguna.getId());

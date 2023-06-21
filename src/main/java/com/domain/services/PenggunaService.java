@@ -40,6 +40,15 @@ public class PenggunaService {
         return penggunas;
     }
 
+    // ============================== FIND BY USERNAME ====================================
+    public Pengguna findByUsername(String username) {
+        Pengguna pengguna = penggunaRepo.findByUsername(username);
+        if (pengguna == null) {
+            throw new IllegalArgumentException("Pengguna '" + username + "' tidak ditemukan.");
+        }
+        return pengguna;
+    }
+
     // ============================== SAVE ====================================
     public Pengguna save(Pengguna pengguna) {
         String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());

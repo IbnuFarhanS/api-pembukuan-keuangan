@@ -50,6 +50,17 @@ public class PenggunaController {
         }
     }
 
+    // ============================== FIND BY USERNAME ====================================
+    @GetMapping("/findByUsername/{username}")
+    public ResponseEntity<?> findByUsername(@PathVariable String username) {
+        try {
+            Pengguna pengguna = penggunaService.findByUsername(username);
+            return ResponseEntity.ok(pengguna);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     // ============================== SAVE ====================================
     @PostMapping
     public ResponseEntity<Pengguna> save(@RequestBody Pengguna pengguna) {
@@ -65,6 +76,7 @@ public class PenggunaController {
         Pengguna existingPengguna = penggunaService.findById(id).orElse(null);
         if (existingPengguna != null) {
             existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
+            existingPengguna.setUsername(pengguna.getUsername());
             existingPengguna.setEmail(pengguna.getEmail());
 
             // Cek apakah password berubah

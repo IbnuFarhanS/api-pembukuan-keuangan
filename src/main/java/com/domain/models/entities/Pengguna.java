@@ -13,9 +13,12 @@ public class Pengguna {
     @Column(name = "nama_pengguna")
     private String namaPengguna;
 
-    private String email;
+    @Column(name = "username")
+    private String username;
 
     private String password;
+
+    private String email;
 
     public Pengguna() {
     }
@@ -24,10 +27,11 @@ public class Pengguna {
         this.id = id;
     }
 
-    public Pengguna(String namaPengguna, String email, String password) {
+    public Pengguna(String namaPengguna, String username, String password, String email) {
         this.namaPengguna = namaPengguna;
-        this.email = email;
+        this.username = username;
         this.password = password;
+        this.email = email;
     }
 
     public Long getId() {
@@ -46,12 +50,12 @@ public class Pengguna {
         this.namaPengguna = namaPengguna;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -60,5 +64,13 @@ public class Pengguna {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

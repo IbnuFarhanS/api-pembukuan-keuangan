@@ -13,6 +13,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/login").permitAll()
+
                 .antMatchers("/api/kategori").permitAll()
                 .antMatchers("/api/kategori/{id}").permitAll()
                 .antMatchers("/api/kategori/findByName/{name}").permitAll()
