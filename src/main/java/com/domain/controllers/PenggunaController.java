@@ -63,32 +63,52 @@ public class PenggunaController {
 
     // ============================== SAVE ====================================
     @PostMapping
-    public ResponseEntity<Pengguna> save(@RequestBody Pengguna pengguna) {
-        Pengguna createdPengguna = penggunaService.save(pengguna);
-        String encryptedPassword = PasswordEncoderExample.encodePassword(createdPengguna.getPassword());
-        createdPengguna.setPassword(encryptedPassword);
-        return ResponseEntity.ok(createdPengguna);
+    public ResponseEntity<?> save(@RequestBody Pengguna pengguna) {
+        try {
+            Pengguna createdPengguna = penggunaService.save(pengguna);
+            return ResponseEntity.ok(createdPengguna);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // ============================== UPDATE ====================================
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody Pengguna pengguna) {
-        Pengguna existingPengguna = penggunaService.findById(id).orElse(null);
-        if (existingPengguna != null) {
-            existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
-            existingPengguna.setUsername(pengguna.getUsername());
-            existingPengguna.setEmail(pengguna.getEmail());
+        try {
+            Pengguna existingPengguna = penggunaService.findById(id).orElse(null);
+            if (existingPengguna != null) {
+                String newUsername = pengguna.getUsername();
 
-            // Cek apakah password berubah
-            if (!pengguna.getPassword().equals(existingPengguna.getPassword())) {
-                existingPengguna.setPassword(pengguna.getPassword());
+                // Check if new username already exists for other users
+                if (penggunaService.existsByUsername(newUsername) && !newUsername.equals(existingPengguna.getUsername())) {
+                    String errorMessage = "Username pengguna '" + newUsername + "' sudah digunakan.";
+                    return ResponseEntity.badRequest().body(errorMessage);
+                }
+
+                existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
+                existingPengguna.setUsername(newUsername);
+                existingPengguna.setEmail(pengguna.getEmail());
+
+                // Check if password has changed
+                if (!pengguna.getPassword().equals(existingPengguna.getPassword())) {
+                    String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());
+                    existingPengguna.setPassword(encryptedPassword);
+                }
+
+                Pengguna updatedPengguna = penggunaService.update(existingPengguna);
+                if (updatedPengguna != null) {
+                    return ResponseEntity.ok(updatedPengguna);
+                } else {
+                    String errorMessage = "Gagal memperbarui pengguna.";
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+                }
+            } else {
+                String errorMessage = "Data dengan ID " + id + " tidak ditemukan.";
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
             }
-
-            Pengguna updatedPengguna = penggunaService.update(existingPengguna);
-            return ResponseEntity.ok(updatedPengguna);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Data dengan ID " + id + " tidak ditemukan.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

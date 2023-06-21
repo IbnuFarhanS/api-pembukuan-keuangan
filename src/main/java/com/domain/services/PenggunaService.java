@@ -51,6 +51,10 @@ public class PenggunaService {
 
     // ============================== SAVE ====================================
     public Pengguna save(Pengguna pengguna) {
+        String username = pengguna.getUsername();
+        if (penggunaRepo.existsByUsername(username)) {
+            throw new IllegalArgumentException("Username pengguna '" + username + "' sudah digunakan.");
+        }
         String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());
         pengguna.setPassword(encryptedPassword);
         return penggunaRepo.save(pengguna);
@@ -61,16 +65,25 @@ public class PenggunaService {
         Optional<Pengguna> existingPenggunaOpt = penggunaRepo.findById(pengguna.getId());
         if (existingPenggunaOpt.isPresent()) {
             Pengguna existingPengguna = existingPenggunaOpt.get();
+            String newUsername = pengguna.getUsername();
+
+            // Check if new username already exists for other users
+            if (penggunaRepo.existsByUsername(newUsername) && !existingPengguna.getUsername().equals(newUsername)) {
+                throw new IllegalArgumentException("Username pengguna '" + newUsername + "' sudah digunakan.");
+            }
+
             existingPengguna.setNamaPengguna(pengguna.getNamaPengguna());
+            existingPengguna.setUsername(newUsername);
             existingPengguna.setEmail(pengguna.getEmail());
 
-            // Cek apakah password berubah
+            // Check if password has changed
             if (!pengguna.getPassword().equals(existingPengguna.getPassword())) {
                 String encryptedPassword = PasswordEncoderExample.encodePassword(pengguna.getPassword());
                 existingPengguna.setPassword(encryptedPassword);
             }
 
-            return penggunaRepo.update(existingPengguna);
+            Pengguna updatedPengguna = penggunaRepo.update(existingPengguna);
+            return updatedPengguna;
         } else {
             throw new IllegalArgumentException("Pengguna dengan ID '" + pengguna.getId() + "' tidak ditemukan.");
         }
@@ -79,5 +92,10 @@ public class PenggunaService {
     // ============================== DELETE ====================================
     public void deleteById(Long id) {
         penggunaRepo.delete(id);
+    }
+
+    // ============================== EXISTS BY USERNNAME ====================================
+    public boolean existsByUsername(String username) {
+        return penggunaRepo.existsByUsername(username);
     }
 }

@@ -83,6 +83,14 @@ public class PenggunaRepo {
         return pengguna;
     }
 
+    // ============================== EXISTS BY USERNAME ====================================
+    public boolean existsByUsername(String username) {
+        String sql = "SELECT COUNT(*) FROM pengguna WHERE username = :username";
+        MapSqlParameterSource params = new MapSqlParameterSource().addValue("username", username);
+        int count = jdbcTemplate.queryForObject(sql, params, Integer.class);
+        return count > 0;
+    }
+
     // ============================== UPDATE ====================================
     public Pengguna update(Pengguna pengguna) {
         String sql = "UPDATE pengguna SET nama_pengguna = :namaPengguna, username = :username, email = :email, password = :password WHERE id = :id";
