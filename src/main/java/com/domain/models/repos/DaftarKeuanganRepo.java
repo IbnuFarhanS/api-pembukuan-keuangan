@@ -31,7 +31,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND ALL ID ====================================
     public List<DaftarKeuangan> findAll() {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -45,6 +45,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
@@ -67,7 +68,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY ID ====================================
     public DaftarKeuangan findById(Long id) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -85,6 +86,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
@@ -148,7 +150,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY ID Kategori ====================================
     public List<DaftarKeuangan> findByKategoriId(Long kategoriId) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -165,6 +167,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
@@ -187,7 +190,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY ID Pengguna ====================================
     public List<DaftarKeuangan> findByPenggunaId(Long penggunaId) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -204,6 +207,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
@@ -226,7 +230,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY Amount Greater Than ====================================
     public List<DaftarKeuangan> findByAmountGreaterThan(Double amount) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -243,6 +247,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
@@ -265,7 +270,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY Amount Less Then ====================================
     public List<DaftarKeuangan> findByAmountLessThan(Double amount) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -282,6 +287,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);
@@ -304,7 +310,7 @@ public class DaftarKeuanganRepo {
 
     // ============================== FIND BY DATE BETWEEN ====================================
     public List<DaftarKeuangan> findByDateBetween(String startDate, String endDate) {
-        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
+        String sql = "SELECT dk.id, dk.amount, dk.date, p.id AS pengguna_id, p.nama_pengguna, p.username, p.email, p.password, c.id AS customer_id, c.nama_customer, c.nomor, c.alamat, k.id AS kategori_id, k.name AS kategori_name " +
                     "FROM daftar_keuangan dk " +
                     "JOIN tbl_kategori k ON dk.kategori_id = k.id " +
                     "JOIN pengguna p ON dk.pengguna_id = p.id " +
@@ -322,6 +328,7 @@ public class DaftarKeuanganRepo {
             Pengguna pengguna = new Pengguna();
             pengguna.setId(rs.getLong("pengguna_id"));
             pengguna.setNamaPengguna(rs.getString("nama_pengguna"));
+            pengguna.setUsername(rs.getString("username"));
             pengguna.setEmail(rs.getString("email"));
             pengguna.setPassword(rs.getString("password"));
             daftarKeuangan.setPengguna(pengguna);

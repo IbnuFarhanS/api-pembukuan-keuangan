@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import com.domain.helpers.password.PasswordEncoderExample;
 
 @SpringBootApplication
-public class ApiMandiriApplication {
+public class ApiPembukuanKeuangan {
     // ...
 
     @Bean
@@ -17,7 +17,7 @@ public class ApiMandiriApplication {
 	}
 
     public static void main(String[] args) {
-        SpringApplication.run(ApiMandiriApplication.class, args);
+        SpringApplication.run(ApiPembukuanKeuangan.class, args);
     }
 
 }
