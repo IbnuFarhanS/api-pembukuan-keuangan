@@ -1,0 +1,116 @@
+User Manual Book Project ApiPembukuanKeuangan
+
+===== Persiapan =====
+User dapat membuat database terlebih dahulu dan melakukan konfigurasi koneksi database yang dibuat.
+User dapat melakukan konfigurasi database di package "src/main/resources/application.properties"
+User tidak perlu membuat table secara manual karena saat dijalankan programnya akan membuat table nya secara otomatis,
+sehingga user hanya perlu membuat nama database nya saja dan di konfigurasi.
+
+===== Run Project =====
+Saat ingin menjalankan project dapat membuka terminal dan menuliskan command "mvn spring-boot:run"
+User dapat menjalankan API menggunakan aplikasi bantuan seperti Postman atau platform lainnya
+
+===== Fitur Kategori =====
+adapaun beberapa url yang dapat digunakan user adalah :
+
+- http://localhost:8080/api/kategori untuk metode Find All (GET)
+- http://localhost:8080/api/kategori/{id} untuk metode Find ID (GET). Contoh http://localhost:8080/api/kategori/1 untuk mencari data berdasarkan ID = 1
+- http://localhost:8080/api/kategori/findByName/{name} untuk metode Find By Name (GET). Contoh http://localhost:8080/api/kategori/findByName/Kredit untuk mencari data berdasarkan name = Kredit
+- http://localhost:8080/api/kategori untuk metode Create dengan body request dalam format JSON (POST):
+
+{
+    "name" : "nama kategori 1"
+}
+
+- http://localhost:8080/api/kategori/{id} untuk metode Update dengan body request dalam format JSON (PUT):
+
+{
+    "name" : "nama kategori update"
+}
+
+- http://localhost:8080/api/kategori/{id} untuk metode Delete (DELETE)
+
+===== Fitur Pengguna =====
+adapaun beberapa url yang dapat digunakan user adalah :
+
+- http://localhost:8080/api/pengguna untuk metode Find All (GET)
+- http://localhost:8080/api/pengguna/{id} untuk metode Find ID (GET). Contoh http://localhost:8080/api/pengguna/1 untuk mencari data berdasarkan ID = 1
+- http://localhost:8080/api/pengguna/findByNamaPengguna/{namaPengguna} untuk metode Find By Nama Pengguna (GET). Contoh http://localhost:8080/api/pengguna/findByNamaPengguna/Ibnu untuk mencari data bedasarkan namaPengguna = Ibnu
+- http://localhost:8080/api/pengguna untuk metode Create dengan body request dalam format JSON (POST):
+
+{
+    "namaPengguna": "Pengguna 1",
+    "username" : "pengguna1",
+    "email": "pengguna1@gmail.com",
+    "password": "pengguna1"
+}
+
+- http://localhost:8080/api/pengguna/{id} untuk metode Update dengan body request dalam format JSON (PUT):
+
+{
+    "namaPengguna": "Pengguna Update",
+    "username" : "PenggunaUpdate",
+    "email": "penggunaUpdate@gmail.com",
+    "password": "penggunaUpdate"
+}
+
+- http://localhost:8080/api/pengguna/{id} untuk metode Delete (DELETE)
+
+===== Fitur Customer =====
+adapaun beberapa url yang dapat digunakan user adalah :
+
+- http://localhost:8080/api/customer untuk metode Find All (GET)
+- http://localhost:8080/api/customer/{id} untuk metode Find ID (GET). Contoh http://localhost:8080/api/customer/1 untuk mencari data berdasarkan ID = 1
+- http://localhost:8080/api/customer/findByNamaCustomer/{namaCustomer}  untuk metode Find By Nama Customer (GET). Contoh http://localhost:8080/api/customer/findByNamaCustomer/Ibnu untuk mencari data bedasarkan namaCustomer = Ibnu
+- http://localhost:8080/api/customer untuk metode Create dengan body request dalam format JSON (POST):
+
+{
+    "namaCustomer": "Customer 1",
+    "nomor": "08479928909",
+    "alamat": "Alamat Customer 1"
+}
+
+- http://localhost:8080/api/customer/{id} untuk metode Update dengan body request dalam format JSON (PUT):
+
+{
+    "namaCustomer": "Customer Update",
+    "nomor": "08789587832",
+    "alamat": "Alamat Customer Update"
+}
+
+- http://localhost:8080/api/customer/{id} untuk metode Delete (DELETE)
+
+===== Fitur Daftar Keuangan =====
+adapaun beberapa url yang dapat digunakan user adalah :
+
+- http://localhost:8080/api/daftar-keuangan untuk metode Find All (GET)
+- http://localhost:8080/api/daftar-keuangan/{id} untuk metode Find ID (GET). Contoh http://localhost:8080/api/daftar-keuangan/1 untuk mencari data berdasarkan ID = 1
+- http://localhost:8080/api/daftar-keuangan untuk metode Create dengan body request dalam format JSON (POST):
+
+{
+    "pengguna" : 1, --id pengguna yang terdaftar
+    "customer" : 1, --id customer yang terdaftar
+    "kategori" : 5, --id kategori yang terdaftar
+    "amount" : 100,
+    "date" : "2023-06-12"
+}
+
+- http://localhost:8080/api/daftar-keuangan/{id} untuk metode Update dengan body request dalam format JSON (PUT):
+
+{
+    "pengguna" : 2, --id pengguna yang terdaftar
+    "customer" : 2, --id customer yang terdaftar
+    "kategori" : 3, --id kategori yang terdaftar
+    "amount" : 1500,
+    "date" : "2023-06-12"
+}
+
+- http://localhost:8080/api/daftar-keuangan/{id} untuk metode Delete (DELETE)
+- http://localhost:8080/api/daftar-keuangan/pengguna/{id} untuk metode Find By Pengguna ID (GET)
+- http://localhost:8080/api/daftar-keuangan/kategori/{id} untuk metode Find By Kategori ID (GET)
+- http://localhost:8080/api/daftar-keuangan/amount-greater-than/{amount} untuk metode Find By Amount Greater Than (GET). contoh http://localhost:8080/api/daftar-keuangan/amount-greater-than/200 utnuk mencari data berdasarkan amount lebih besar dari 200
+- http://localhost:8080/api/daftar-keuangan/amount-less-than/{amount} untuk metode Find By Less Than (GET). contoh http://localhost:8080/api/daftar-keuangan/amount-less-than/1000 untuk mencari data berdasarkan amount lebih kecil dari 1000
+- http://localhost:8080/api/daftar-keuangan/date-between/{startDate}/{endDate} untuk metode Find By Between Date (GET). contoh http://localhost:8080/api/daftar-keuangan/date-between/2023-06-01/2023-06-10 untuk mencari data berdasarkan date antara2023-06-01 sampai 2023-06-10
+- http://localhost:8080/api/daftar-keuangan/grouped-by-amount untuk metode Grouped By Amount atau menampilkan data dari amoun terkecil hingga terbesar
+
+Semua url sudah diberikan validasi jika berhasil dan jika gagal mencari atau menampilkan data.
